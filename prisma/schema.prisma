@@ -1,0 +1,33 @@
+// Banglish comments sudhu
+// Ei file Prisma schema for Student aar Admin models
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id          String   @id @default(uuid())
+  full_name   String
+  ID_no       String
+  batch       String?
+  phone       String
+  email       String   @unique
+  department  String
+  gender      String
+  apply_for_post String
+  photo_url   String
+  note        String?
+  selected    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+}

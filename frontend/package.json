@@ -1,0 +1,13 @@
+{
+  "name": "ice-committee-frontend",
+  "version": "1.0.0",
+  "description": "ICE Committee Registration Frontend",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "start": "serve -s . -l 3000"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

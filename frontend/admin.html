@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - ICE Committee</title>
+  <link rel="stylesheet" href="style_admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Modern Navbar -->
+    <div class="navbar">
+      <div class="navbar-left">
+        <div class="logo-section">
+          <div class="logo-icon">🎓</div>
+          <div>
+            <h1>ICE Committee</h1>
+            <p class="subtitle">Admin Dashboard</p>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-right">
+        <div class="admin-info">
+          <div class="admin-avatar">👤</div>
+          <span class="admin-name">Administrator</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <span class="logout-icon">🚪</span>
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Message container -->
+    <div id="messageContainer"></div>
+
+    <!-- Stats grid with modern cards -->
+    <div class="stats-grid">
+      <div class="stat-card total-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>Total Candidates</h3>
+          <div class="number" id="totalCount">0</div>
+          <div class="stat-trend">
+            <span class="trend-indicator up">↑ Active</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card selected-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>Selected</h3>
+          <div class="number" id="selectedCount">0</div>
+          <div class="stat-trend">
+            <span class="trend-indicator up">↑ Approved</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card pending-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>Pending</h3>
+          <div class="number" id="pendingCount">0</div>
+          <div class="stat-trend">
+            <span class="trend-indicator neutral">⟳ In Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and filter section -->
+    <div class="filter-section">
+      <div class="filter-header">
+        <h2>🔍 Student Management</h2>
+        <button class="refresh-btn" onclick="loadStudents()">
+          <span class="refresh-icon">🔄</span>
+          Refresh
+        </button>
+      </div>
+      
+      <div class="search-filter">
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by name, email, or ID..."
+            onkeyup="filterStudents()"
+          >
+        </div>
+        
+        <div class="filter-group">
+          <select id="batchFilter" onchange="filterStudents()" class="filter-select">
+            <option value="">All Batches</option>
+            <option value="14">Batch 14</option>
+            <option value="15">Batch 15</option>
+            <option value="16">Batch 16</option>
+          </select>
+          
+          <select id="postFilter" onchange="filterStudents()" class="filter-select">
+            <option value="">All Posts</option>
+            <option value="President">President</option>
+            <option value="Vice President">Vice President</option>
+            <option value="General Secretary">General Secretary</option>
+            <option value="Treasurer">Treasurer</option>
+            <option value="Organizing Secretary">Organizing Secretary</option>
+            <option value="Executive Member">Executive Member</option>
+          </select>
+          
+          <select id="statusFilter" onchange="filterStudents()" class="filter-select">
+            <option value="">All Status</option>
+            <option value="selected">Selected</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students table -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table id="studentsTable">
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Name</th>
+              <th>ID No</th>
+              <th>Batch</th>
+              <th>Email</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 40px;">
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 15px; color: #666;">Loading students...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo Preview Modal -->
+  <div id="photoModal" class="modal">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content profile-modal">
+      <div class="modal-header">
+        <h2>👤 Student Profile</h2>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      
+      <div class="profile-layout">
+        <div class="profile-image-section">
+          <div id="imageContainer" class="image-container">
+            <img id="modalPhoto" src="" class="zoomable-image">
+            
+            <div class="zoom-controls">
+              <button onclick="zoomOut()" class="zoom-btn">➖</button>
+              <span id="zoomLevel" class="zoom-level">100%</span>
+              <button onclick="zoomIn()" class="zoom-btn">➕</button>
+              <button onclick="resetZoom()" class="zoom-btn">🔄</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-details-section">
+          <div class="profile-details">
+            <div class="detail-item">
+              <span class="detail-label">📝 Full Name</span>
+              <span class="detail-value" id="detailFullName">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">🆔 ID Number</span>
+              <span class="detail-value" id="detailID">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">🎓 Batch</span>
+              <span class="detail-value" id="detailBatch">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">📧 Email</span>
+              <span class="detail-value" id="detailEmail">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">📱 Phone</span>
+              <span class="detail-value" id="detailPhone">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">🏛️ Department</span>
+              <span class="detail-value" id="detailDept">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">⚧️ Gender</span>
+              <span class="detail-value" id="detailGender">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">💼 Position Applied</span>
+              <span class="detail-value" id="detailPost">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">📊 Status</span>
+              <span class="detail-value" id="detailStatus">-</span>
+            </div>
+            <div class="detail-item full-width">
+              <span class="detail-label">📌 Note</span>
+              <span class="detail-value" id="detailNote">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-backdrop" onclick="closeDeleteModal()"></div>
+    <div class="modal-content small-modal">
+      <div class="modal-header">
+        <h2>⚠️ Confirm Delete</h2>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this student? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-danger" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Post Modal -->
+  <div id="editPostModal" class="modal">
+    <div class="modal-backdrop" onclick="closeEditPostModal()"></div>
+    <div class="modal-content small-modal">
+      <div class="modal-header">
+        <h2>✏️ Change Student Position</h2>
+      </div>
+      <div class="modal-body">
+        <p id="editStudentName" class="student-name-edit"></p>
+        <div class="form-group">
+          <label for="newPost">Select New Position</label>
+          <select id="newPost" class="form-select">
+            <option value="">Select Position</option>
+            <option value="President">President</option>
+            <option value="Vice President">Vice President</option>
+            <option value="General Secretary">General Secretary</option>
+            <option value="Treasurer">Treasurer</option>
+            <option value="Organizing Secretary">Organizing Secretary</option>
+            <option value="Executive Member">Executive Member</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeEditPostModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmEditPost()">Update & Send Email</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

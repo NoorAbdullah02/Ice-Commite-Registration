@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: ice-committee-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        scope: build
+      - key: JWT_SECRET
+        scope: build
+      - key: CLOUDINARY_NAME
+        scope: build
+      - key: CLOUDINARY_API_KEY
+        scope: build
+      - key: CLOUDINARY_API_SECRET
+        scope: build
+      - key: BREVO_API_KEY
+        scope: build
+      - key: BREVO_SENDER_EMAIL
+        scope: build
+      - key: BREVO_SENDER_NAME
+        value: "ICE Committee"
+      - key: FRONTEND_URL
+        scope: build

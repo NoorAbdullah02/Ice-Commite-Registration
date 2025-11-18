@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Banglish comments sudhu -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Successful</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .success-container {
+      max-width: 700px;
+      width: 100%;
+      background: white;
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 3px solid #f0f0f0;
+    }
+
+    .success-icon {
+      font-size: 70px;
+      margin-bottom: 20px;
+      display: inline-block;
+      animation: bounce 0.6s ease-out;
+    }
+
+    @keyframes bounce {
+      0% {
+        transform: scale(0.5);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .success-header h1 {
+      color: #28a745;
+      margin: 15px 0;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .success-header p {
+      color: #666;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .photo-section {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .profile-photo {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid #667eea;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-photo:hover {
+      transform: scale(1.05);
+    }
+
+    .confirmation-section {
+      background: linear-gradient(135deg, #e7f3ff 0%, #e0e7ff 100%);
+      border-left: 5px solid #2196F3;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px 0;
+    }
+
+    .confirmation-section h3 {
+      margin: 0 0 12px 0;
+      color: #1976D2;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .confirmation-section p {
+      margin: 0;
+      color: #0d47a1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .info-section {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 10px;
+      margin: 30px 0;
+      border: 2px solid #e9ecef;
+    }
+
+    .info-section h3 {
+      margin: 0 0 25px 0;
+      color: #333;
+      font-size: 18px;
+      font-weight: 700;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 700;
+      color: #333;
+      min-width: 140px;
+      font-size: 14px;
+    }
+
+    .info-value {
+      color: #555;
+      text-align: right;
+      flex: 1;
+      margin-left: 20px;
+      font-size: 15px;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .note-section {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+      border-left: 5px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px 0;
+      display: none;
+    }
+
+    .note-section h3 {
+      margin: 0 0 12px 0;
+      color: #856404;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .note-section p {
+      margin: 0;
+      color: #333;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    .button-group button {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .button-primary:hover {
+      background: linear-gradient(135deg, #5568d3 0%, #653a8e 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .button-secondary {
+      background: #e9ecef;
+      color: #333;
+      border: 2px solid #dee2e6;
+    }
+
+    .button-secondary:hover {
+      background: #dee2e6;
+      transform: translateY(-3px);
+    }
+
+    .info-message {
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .success-container {
+        padding: 30px;
+        margin: 20px;
+      }
+
+      .success-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+      }
+
+      .success-header h1 {
+        font-size: 26px;
+      }
+
+      .success-icon {
+        font-size: 50px;
+      }
+
+      .profile-photo {
+        width: 140px;
+        height: 140px;
+        border-width: 4px;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .info-section h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+      }
+
+      .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 0;
+      }
+
+      .info-label {
+        margin-bottom: 6px;
+      }
+
+      .info-value {
+        text-align: left;
+        margin-left: 0;
+        margin-top: 5px;
+      }
+
+      .button-group {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 30px;
+      }
+
+      .button-group button {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .confirmation-section {
+        padding: 15px;
+      }
+
+      .confirmation-section h3 {
+        font-size: 14px;
+      }
+
+      .note-section {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <!-- Success Header -->
+    <div class="success-header">
+      <div class="success-icon">✅</div>
+      <h1>Registration Successful!</h1>
+      <p>Your registration has been submitted successfully</p>
+    </div>
+
+    <!-- Photo Section -->
+    <div class="photo-section">
+      <img id="photoImg" src="" alt="Profile Photo" class="profile-photo">
+    </div>
+
+    <!-- Confirmation Message -->
+    <div class="confirmation-section">
+      <h3>📧 Confirmation Email Sent</h3>
+      <p>A confirmation email has been sent to your email address with all the details of your registration.</p>
+    </div>
+
+    <!-- Student Information -->
+    <div class="info-section">
+      <h3 style="margin-top: 0; color: #333;">📋 Your Information</h3>
+      
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value" id="displayName">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">ID Number</span>
+        <span class="info-value" id="displayID">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Batch</span>
+        <span class="info-value" id="displayBatch">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value" id="displayEmail">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Phone</span>
+        <span class="info-value" id="displayPhone">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Department</span>
+        <span class="info-value" id="displayDept">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Gender</span>
+        <span class="info-value" id="displayGender">-</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Applied Position</span>
+        <span class="info-value" id="displayPost">-</span>
+      </div>
+    </div>
+
+    <!-- Additional Note -->
+    <div class="note-section" id="noteSection">
+      <h3>📝 Additional Note</h3>
+      <p id="displayNote">-</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button class="button-primary" onclick="confirmAndClose()">
+        ✅ Confirm & Close
+      </button>
+      <button class="button-secondary" onclick="goHome()">
+        🏠 Go to Home
+      </button>
+    </div>
+
+    <!-- Info Message -->
+    <div class="info-message">
+      <p>✉️ The admin will review your application and you will be notified via email soon.</p>
+    </div>
+  </div>
+
+  <script>
+    // Registration data load kore local storage theke
+    console.log('Success page loaded');
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM Content Loaded');
+      try {
+        const registrationDataStr = sessionStorage.getItem('registrationData');
+        console.log('SessionStorage data:', registrationDataStr);
+        
+        if (!registrationDataStr) {
+          console.log('No registration data found, redirecting to home...');
+          // Ager page theke aseni to home e niye jao
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          return;
+        }
+
+        const registrationData = JSON.parse(registrationDataStr);
+        console.log('Parsed registration data:', registrationData);
+
+        if (!registrationData.full_name) {
+          console.log('No full_name found, redirecting to home...');
+          // Ager page theke aseni to home e niye jao
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          return;
+        }
+
+        // All data display kore
+        const displayElements = {
+          'displayName': registrationData.full_name || '-',
+          'displayID': registrationData.ID_no || '-',
+          'displayBatch': registrationData.batch ? `Batch ${registrationData.batch}` : 'N/A',
+          'displayEmail': registrationData.email || '-',
+          'displayPhone': registrationData.phone || '-',
+          'displayDept': registrationData.department || '-',
+          'displayGender': registrationData.gender || 'Not specified',
+          'displayPost': registrationData.apply_for_post || '-'
+        };
+
+        for (const [elementId, value] of Object.entries(displayElements)) {
+          const element = document.getElementById(elementId);
+          if (element) {
+            element.textContent = value;
+            console.log(`Set ${elementId} to ${value}`);
+          } else {
+            console.warn(`Element ${elementId} not found`);
+          }
+        }
+
+        // Photo show kore
+        if (registrationData.photo_url) {
+          const photoImg = document.getElementById('photoImg');
+          if (photoImg) {
+            photoImg.src = registrationData.photo_url;
+            console.log('Photo set:', registrationData.photo_url);
+          }
+        }
+
+        // Note show kore if exists
+        if (registrationData.note && registrationData.note.trim()) {
+          const noteSection = document.getElementById('noteSection');
+          const displayNote = document.getElementById('displayNote');
+          if (noteSection && displayNote) {
+            displayNote.textContent = registrationData.note;
+            noteSection.style.display = 'block';
+            console.log('Note section shown');
+          }
+        }
+        
+        console.log('Success page setup complete');
+      } catch (error) {
+        console.error('Error in success page:', error);
+      }
+    });
+
+    // Confirm and clear data
+    function confirmAndClose() {
+      console.log('Confirm and close clicked');
+      sessionStorage.removeItem('registrationData');
+      window.location.href = '/';
+    }
+
+    // Go to home
+    function goHome() {
+      console.log('Go home clicked');
+      sessionStorage.removeItem('registrationData');
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
