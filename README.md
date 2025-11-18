@@ -1,101 +1,361 @@
-# ICE Committee Registration Portal
+# 🎓 ICE Committee Registration Portal
 
-Ei ekta production-ready Committee Registration system, banano **Node.js + Express + Vanilla JavaScript** diye, **PostgreSQL (Neon) + Prisma** diye.
+**A professional registration system for ICE Committee with admin dashboard, batch management, and email notifications.**
 
-## 🎯 Features
+Built with **Node.js + Express + PostgreSQL + Vanilla JavaScript**
 
-✅ Student Registration Form (HTML/CSS/JS)  
-✅ Photo Upload to Cloudinary (3MB limit, JPG/PNG)  
-✅ Automatic Email Confirmation (Brevo API)  
-✅ Admin Panel with JWT Auth (HttpOnly cookies)  
-✅ Dashboard Statistics & Filtering  
-✅ Select Candidates & Send Selection Email  
-✅ Delete Student Records  
-✅ Fully Responsive UI  
-✅ All Comments in Banglish  
+---
+
+## ✨ Features
+
+✅ **Student Registration** - Beautiful form with validation  
+✅ **Photo Upload** - Direct to Cloudinary (JPG/PNG, 3MB)  
+✅ **Email Notifications** - Automatic confirmation via Brevo  
+✅ **Admin Dashboard** - Complete student management  
+✅ **JWT Authentication** - Secure with HttpOnly cookies  
+✅ **Batch Management** - Support for multiple batches (14, 15, 16)  
+✅ **Advanced Filtering** - Search by name, email, ID, batch, post, status  
+✅ **Student Selection** - Mark as selected with confirmation email  
+✅ **Responsive Design** - Works on desktop, tablet, mobile  
+✅ **Production Ready** - Fully tested and documented  
+
+---
 
 ## 📁 Project Structure
 
 ```
-project/
- ├── backend/
- │   ├── server.js              # Express server entry point
- │   ├── routes/
- │   │   ├── register.js        # Student registration API
- │   │   ├── adminLogin.js      # Admin login & JWT
- │   │   ├── students.js        # Fetch students (admin)
- │   │   ├── select.js          # Select & delete students
- │   │   └── upload.js          # Cloudinary upload
- │   ├── middleware/
- │   │   └── auth.js            # JWT verification middleware
- │   └── utils/
- │       ├── jwt.js             # Token sign/verify
- │       ├── cloudinary.js      # Image upload helper
- │       └── email.js           # Brevo email sender
- ├── frontend/
- │   ├── index.html             # Registration page
- │   ├── admin.html             # Admin dashboard
- │   ├── login.html             # Admin login
- │   ├── success.html           # Success page
- │   ├── style.css              # Global styles
- │   ├── script.js              # Registration form JS
- │   ├── login.js               # Login form JS
- │   └── admin.js               # Dashboard JS
- ├── prisma/
- │   ├── schema.prisma          # Database schema
- │   └── seed.js                # Seed default admins
- ├── .env                       # Environment variables (git-ignored)
- ├── .env.example               # Example environment file
- ├── package.json               # Dependencies
- └── README.md                  # This file
+ice-committee-registration/
+├── backend/
+│   ├── server.js               # Express server
+│   ├── package.json            # Dependencies
+│   ├── .env                    # Environment variables
+│   ├── prisma/
+│   │   ├── schema.prisma       # Database schema
+│   │   └── seed.js             # Seed data
+│   ├── routes/
+│   │   ├── register.js         # Registration API
+│   │   ├── adminLogin.js       # Admin authentication
+│   │   ├── students.js         # Fetch students
+│   │   ├── select.js           # Select/delete students
+│   │   └── upload.js           # File upload
+│   ├── middleware/
+│   │   └── auth.js             # JWT verification
+│   └── utils/
+│       ├── jwt.js              # Token utilities
+│       ├── cloudinary.js       # Image upload
+│       └── email.js            # Email sender
+│
+├── frontend/
+│   ├── index.html              # Registration form
+│   ├── admin.html              # Admin dashboard
+│   ├── login.html              # Admin login
+│   ├── success.html            # Success page
+│   ├── config.js               # API configuration
+│   ├── script.js               # Form logic
+│   ├── admin.js                # Dashboard logic
+│   ├── login.js                # Login logic
+│   ├── style.css               # Global styles
+│   ├── style_admin.css         # Admin styles
+│   └── package.json            # Static server
+│
+└── DEPLOYMENT_GUIDE.md         # Deployment instructions
 ```
 
-## 🚀 Quick Start
+---
 
-### 1️⃣ Prerequisites
-- Node.js 16+ installed
-- PostgreSQL database (Neon account)
-- Cloudinary account
-- Brevo (SendInBlue) account
+## 🚀 Development Setup
 
-### 2️⃣ Clone & Install
+### Prerequisites
+
+- **Node.js** 18+ or 20+
+- **PostgreSQL** database (local or cloud)
+- **Cloudinary** account (free tier)
+- **Brevo** account (free email API)
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <your-repo-url>
 cd ICPC_MOCK
+
+# Install backend dependencies
+cd backend
 npm install
-```
 
-### 3️⃣ Configure Environment
-
-Copy `.env.example` to `.env` and update values:
-
-```bash
+# Configure environment
 cp .env.example .env
-```
+# Edit .env with your credentials
 
-Edit `.env`:
-```
-DATABASE_URL="postgresql://..."
-CLOUDINARY_CLOUD_NAME="..."
-CLOUDINARY_API_KEY="..."
-CLOUDINARY_API_SECRET="..."
-BREVO_API_KEY="..."
-JWT_SECRET="..."
-PORT=5000
-```
-
-### 4️⃣ Database Setup
-
-```bash
 # Generate Prisma client
 npm run prisma:generate
 
-# Create migration (initial schema)
+# Run migrations
 npm run prisma:migrate
 
-# Seed default admins
-npm run seed
+# Seed default admin
+npm run prisma:seed
+
+# Start backend server
+npm run dev
+
+# In another terminal, start frontend
+cd frontend
+npm install
+npm start
 ```
+
+### Access Your App
+
+- **Registration Form:** http://localhost:5000/
+- **Admin Panel:** http://localhost:5000/admin.html
+- **Admin Email:** admin@example.com (set in seed)
+
+---
+
+## 🔧 Environment Variables
+
+Create `.env` file in backend directory:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/icpc_db"
+
+# Server
+PORT=5000
+NODE_ENV=development
+
+# JWT
+JWT_SECRET="your-secret-key-min-32-chars"
+
+# Email Service (Brevo)
+BREVO_API_KEY="your-brevo-api-key"
+BREVO_FROM_EMAIL="noreply@yourdomain.com"
+BREVO_FROM_NAME="ICE Committee"
+
+# File Upload (Cloudinary)
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
+
+# Admin
+ADMIN_EMAIL="admin@yourdomain.com"
+```
+
+---
+
+## 📚 API Endpoints
+
+### Registration
+- `POST /api/register` - Register new student
+
+### Admin
+- `POST /api/admin/login` - Admin login
+- `GET /api/admin/students` - Fetch all students (protected)
+- `POST /api/admin/select/:id` - Mark as selected (protected)
+- `DELETE /api/admin/students/:id` - Delete student (protected)
+
+### Upload
+- `POST /api/upload` - Upload photo to Cloudinary
+
+---
+
+## 🧪 Testing
+
+### Backend
+
+```bash
+cd backend
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+### Test Registration
+1. Go to http://localhost:5000/
+2. Fill form with test data
+3. Upload a photo
+4. Submit
+
+### Test Admin
+1. Go to http://localhost:5000/admin.html
+2. Login with admin credentials
+3. Test filters and actions
+
+---
+
+## 🚀 Deployment
+
+### Option 1: Render (Recommended)
+
+```bash
+# See DEPLOYMENT_GUIDE.md for detailed steps
+
+# Quick summary:
+1. Push to GitHub
+2. Create Web Service on Render
+3. Add DATABASE_URL environment variable
+4. Deploy!
+```
+
+### Option 2: Railway
+
+```bash
+1. Connect GitHub account
+2. Create new project
+3. Add PostgreSQL database
+4. Deploy backend
+5. Deploy frontend to Netlify/Vercel
+```
+
+### Option 3: Traditional VPS
+
+```bash
+1. SSH to server
+2. Install Node.js and PostgreSQL
+3. Clone repository
+4. Configure .env
+5. Run npm install and migrations
+6. Use PM2 to manage process
+```
+
+**📖 See `DEPLOYMENT_GUIDE.md` for complete deployment instructions.**
+
+---
+
+## 🔒 Security
+
+- ✅ Password hashing with bcryptjs
+- ✅ JWT tokens in HttpOnly cookies
+- ✅ CORS properly configured
+- ✅ Input validation with Zod
+- ✅ Environment variables protected
+- ✅ API authentication required for sensitive endpoints
+- ✅ SQL injection prevention via Prisma ORM
+- ✅ File upload validation
+
+---
+
+## 📊 Database Schema
+
+### Student Model
+```prisma
+model Student {
+  id              String   @id @default(uuid())
+  full_name       String
+  ID_no           String
+  batch           String?
+  phone           String
+  email           String   @unique
+  department      String
+  gender          String
+  apply_for_post  String
+  photo_url       String
+  note            String?
+  selected        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+```
+
+### Admin Model
+```prisma
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+}
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Server won't start
+```bash
+# Check if port 5000 is in use
+lsof -i :5000
+
+# Check environment variables
+cat .env
+
+# Generate Prisma client
+npm run prisma:generate
+```
+
+### Database connection error
+```bash
+# Verify DATABASE_URL
+echo $DATABASE_URL
+
+# Test connection
+psql $DATABASE_URL
+```
+
+### Email not sending
+- Verify BREVO_API_KEY is correct
+- Check email is valid
+- Monitor Brevo dashboard for delivery status
+
+### Photos not uploading
+- Verify Cloudinary credentials
+- Check file size (max 3MB)
+- Verify file format (JPG, PNG)
+
+---
+
+## 📞 Support & Contribution
+
+For issues, questions, or contributions, please:
+1. Check existing documentation
+2. Review error messages carefully
+3. Check environment configuration
+4. Consult hosting provider docs
+
+---
+
+## 📄 License
+
+This project is private and confidential.
+
+---
+
+## ✅ Checklist Before Deployment
+
+- [ ] All dependencies installed
+- [ ] `.env` file configured
+- [ ] Database migrations completed
+- [ ] Admin seed completed
+- [ ] Backend tested locally
+- [ ] Frontend API URL updated
+- [ ] CORS configuration correct
+- [ ] SSL certificate ready (if needed)
+- [ ] Email service tested
+- [ ] File upload tested
+- [ ] Admin dashboard tested
+
+---
+
+## 🎯 Next Steps
+
+1. **Development:** Run `npm run dev` to start server
+2. **Testing:** Fill forms and test all features
+3. **Deployment:** Follow `DEPLOYMENT_GUIDE.md`
+4. **Monitoring:** Set up error tracking
+5. **Maintenance:** Regular backups and updates
+
+---
+
+**Ready to deploy? 🚀 See `DEPLOYMENT_GUIDE.md` for detailed instructions.**
+
+Good luck with your ICE Committee Registration Portal!
 
 ### 5️⃣ Start Server
 

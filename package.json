@@ -1,18 +1,16 @@
 {
   "name": "ice-committee-registration",
   "version": "1.0.0",
-  "description": "ICE Committee Registration Portal - Simple JavaScript + Express",
+  "description": "ICE Committee Registration Portal - Separated Backend & Frontend",
   "type": "module",
-  "main": "backend/server.js",
   "scripts": {
-    "dev": "node backend/server.js",
-    "start": "node backend/server.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "seed": "node prisma/seed.js"
+    "backend:dev": "cd backend && npm install && npm run dev",
+    "backend:start": "cd backend && npm run start",
+    "frontend:dev": "cd frontend && npm install && npx http-server -p 3000",
+    "setup": "cd backend && npm install && prisma generate && cd ../frontend && npm install"
   },
   "dependencies": {
-    "@prisma/client": "^5.6.0",
+    "@prisma/client": "5.22.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.8.0",
@@ -25,6 +23,6 @@
     "zod": "^3.23.2"
   },
   "devDependencies": {
-    "prisma": "^5.6.0"
+    "prisma": "5.22.0"
   }
 }
