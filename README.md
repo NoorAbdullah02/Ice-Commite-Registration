@@ -350,6 +350,3 @@ MIT License - Feel free to use for your project!
 
 ---
 
-**Built with ❤️ in Banglish**
-
-এই প্রজেক্টটি সম্পূর্ণভাবে তৈরি এবং প্রোডাকশন-রেডি। যেকোনো সমস্যার জন্য আমরা আছি!
