@@ -5,6 +5,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import registerRoute from './routes/register.js';
 import adminLoginRoute from './routes/adminLogin.js';
 import studentsRoute from './routes/students.js';
@@ -13,6 +15,10 @@ import uploadRoute from './routes/upload.js';
 import updatePostRoute from './routes/updatePost.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendPath = path.join(__dirname, '../frontend');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Static files serve kore (frontend files)
-app.use(express.static('frontend'));
+app.use(express.static(frontendPath));
 
 // Routes
 app.use('/api', registerRoute);
