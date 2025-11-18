@@ -23,9 +23,23 @@ const frontendPath = path.join(__dirname, '../frontend');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Middleware - CORS Configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://ice-commite-registration.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
   credentials: true // cookies allow kore
 }));
 app.use(express.json());
