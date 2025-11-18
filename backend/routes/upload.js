@@ -13,11 +13,26 @@ const upload = multer({
   storage,
   limits: { fileSize: 3 * 1024 * 1024 }, // 3MB limit
   fileFilter: (req, file, cb) => {
-    // Only image files allowed
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
+    // Allow image files with various mime types
+    const allowedMimes = [
+      'image/jpeg', 
+      'image/jpg', 
+      'image/png',
+      'image/webp',
+      'image/gif'
+    ];
+    
+    console.log('📸 File upload attempt:', {
+      name: file.originalname,
+      mimetype: file.mimetype,
+      fieldname: file.fieldname
+    });
+    
     if (!allowedMimes.includes(file.mimetype)) {
-      cb(new Error('Only JPG and PNG files allowed'));
+      console.error('❌ File rejected - invalid mimetype:', file.mimetype);
+      cb(new Error(`Invalid file type: ${file.mimetype}. Only JPG and PNG files allowed`));
     } else {
+      console.log('✅ File accepted');
       cb(null, true);
     }
   }

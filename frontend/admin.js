@@ -2,10 +2,13 @@
 // Manages all admin functionality
 
 // API Configuration - Auto-detect environment
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = isDevelopment 
   ? 'http://localhost:5000'  // Development
   : 'https://ice-commite-registration.onrender.com';  // Production
 
+console.log('🌐 Environment:', isDevelopment ? 'Development' : 'Production');
+console.log('🌐 Hostname:', window.location.hostname);
 console.log('🌐 API URL:', API_URL);
 
 

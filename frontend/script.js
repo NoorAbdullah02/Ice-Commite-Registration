@@ -1,8 +1,11 @@
 // API Configuration - Auto-detect environment
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = isDevelopment 
   ? 'http://localhost:5000'  // Development
   : 'https://ice-commite-registration.onrender.com';  // Production
 
+console.log('🌐 Environment:', isDevelopment ? 'Development' : 'Production');
+console.log('🌐 Hostname:', window.location.hostname);
 console.log('🌐 API URL:', API_URL);
 
 // Initialize particles on page load
@@ -267,20 +270,28 @@ async function uploadPhoto(file) {
   const formData = new FormData();
   formData.append('photo', file);
 
+  console.log('📸 Uploading photo to:', `${API_URL}/api/upload`);
+  console.log('📄 File:', file.name, file.size, file.type);
+
   try {
     const response = await fetch(`${API_URL}/api/upload`, {
       method: 'POST',
       body: formData
     });
 
+    console.log('✅ Upload response status:', response.status);
+    
     const data = await response.json();
+    console.log('📦 Response data:', data);
 
     if (response.ok) {
+      console.log('✅ Photo uploaded successfully:', data.url);
       return data.url;
     } else {
       throw new Error(data.error || 'Upload failed');
     }
   } catch (error) {
+    console.error('❌ Photo upload error:', error);
     throw new Error(`Photo upload failed: ${error.message}`);
   }
 }
