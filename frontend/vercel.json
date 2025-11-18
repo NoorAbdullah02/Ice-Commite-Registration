@@ -1,11 +1,12 @@
 {
-  "buildCommand": "echo 'Static site - no build needed'",
+  "version": 2,
+  "buildCommand": "exit 0",
   "outputDirectory": ".",
-  "framework": "static",
+  "public": true,
   "routes": [
-    { "src": "/admin.html", "dest": "/admin.html" },
-    { "src": "/login.html", "dest": "/login.html" },
-    { "src": "/success.html", "dest": "/success.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/(?!.*\\..*$).*$",
+      "dest": "/index.html"
+    }
   ]
 }

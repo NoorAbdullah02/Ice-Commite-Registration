@@ -1,0 +1,15 @@
+# Vercel ignore file - deploy everything in frontend
+
+# Don't ignore these
+!*.html
+!*.css
+!*.js
+!*.json
+!*.env
+!*.env.example
+
+# Only ignore things we don't need
+node_modules
+.git
+.gitignore
+README.md
