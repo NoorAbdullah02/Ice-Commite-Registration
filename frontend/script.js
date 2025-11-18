@@ -1,5 +1,8 @@
 // API Configuration
-const API_URL = 'http://localhost:5000';
+
+//const API_URL = 'http://localhost:5000';
+
+const API_URL = 'https://ice-commite-registration.onrender.com';
 
 // Initialize particles on page load
 document.addEventListener('DOMContentLoaded', () => {

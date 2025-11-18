@@ -1,7 +1,9 @@
 // Banglish comments sudhu
 // Ei file admin login handle kore
 
-const API_URL = 'http://localhost:5000';
+//const API_URL = 'http://localhost:5000';
+
+const API_URL = 'https://ice-commite-registration.onrender.com'
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();

@@ -1,7 +1,11 @@
 // Admin Dashboard JavaScript
 // Manages all admin functionality
 
-const API_URL = 'http://localhost:5000';
+//const API_URL = 'http://localhost:5000';
+
+const API_URL = 'https://ice-commite-registration.onrender.com';
+
+
 let allStudents = [];
 let studentToDelete = null;
 let studentToEditPost = null;
