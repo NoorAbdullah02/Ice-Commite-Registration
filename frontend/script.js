@@ -1,8 +1,9 @@
-// API Configuration
+// API Configuration - Auto-detect environment
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000'  // Development
+  : 'https://ice-commite-registration.onrender.com';  // Production
 
-//const API_URL = 'http://localhost:5000';
-
-const API_URL = 'https://ice-commite-registration.onrender.com';
+console.log('🌐 API URL:', API_URL);
 
 // Initialize particles on page load
 document.addEventListener('DOMContentLoaded', () => {
