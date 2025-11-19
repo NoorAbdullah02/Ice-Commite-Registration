@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // Create floating particles
 function createParticles() {
   const particlesContainer = document.getElementById('particles');
+  
+  // Skip if particles container doesn't exist (it's optional)
+  if (!particlesContainer) {
+    console.log('✅ Particles container not needed on this page');
+    return;
+  }
+  
   const particleCount = 30;
 
   for (let i = 0; i < particleCount; i++) {
@@ -388,11 +395,17 @@ document.getElementById('phone').addEventListener('blur', function() {
 const submitBtn = document.getElementById('submitBtn');
 let originalBtnText = '';
 
-submitBtn.addEventListener('click', function(e) {
-  if (!this.disabled) {
-    originalBtnText = this.querySelector('.btn-text').textContent;
-  }
-});
+if (submitBtn) {
+  submitBtn.addEventListener('click', function(e) {
+    if (!this.disabled) {
+      // Get text from button-text span instead of btn-text
+      const btnTextSpan = this.querySelector('.button-text');
+      if (btnTextSpan) {
+        originalBtnText = btnTextSpan.textContent;
+      }
+    }
+  });
+}
 
 // Character counter for note textarea
 const noteTextarea = document.getElementById('note');
