@@ -24,23 +24,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware - CORS Configuration
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://ice-commite-registration.vercel.app',
-  'https://ice-committee-frontend.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:5000'
-];
-
+// Using `origin: true` reflects the request's origin.
+// This is a permissive but effective way to handle CORS, especially for development.
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed'));
-    }
-  },
+  origin: true,
   credentials: true // cookies allow kore
 }));
 app.use(express.json());

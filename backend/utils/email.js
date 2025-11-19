@@ -64,6 +64,7 @@ export async function sendSelectionEmail(full_name, email, position) {
   }
 }
 
+
 // Post update confirmation email pathay
 export async function sendPostUpdateEmail(full_name, email, oldPost, newPost) {
   const payload = {
