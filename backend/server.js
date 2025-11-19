@@ -26,6 +26,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware - CORS Configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'https://ice-commite-registration.vercel.app',
+  'https://ice-committee-frontend.vercel.app',
   'http://localhost:3000',
   'http://localhost:5000',
   'http://127.0.0.1:3000',
