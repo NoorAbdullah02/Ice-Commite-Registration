@@ -16,6 +16,7 @@ console.log('🌐 API URL:', API_URL);
 let allStudents = [];
 let studentToDelete = null;
 let studentToEditPost = null;
+let selectedStudents = new Set(); // Track selected students for bulk action
 
 // Load students when page loads
 document.addEventListener('DOMContentLoaded', () => {
@@ -81,12 +82,15 @@ function displayStudents(students) {
   const tbody = document.getElementById('tableBody');
   
   if (students.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div style="color: #94a3b8; font-size: 16px;">📭 No students found</div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;"><div style="color: #94a3b8; font-size: 16px;">📭 No students found</div></td></tr>';
     return;
   }
 
   tbody.innerHTML = students.map(student => `
     <tr>
+      <td style="width: 40px;">
+        <input type="checkbox" class="student-checkbox" value="${student.id}" onchange="updateSelectedStudents()">
+      </td>
       <td>
         <img src="${student.photo_url}" alt="Photo" class="photo-thumb" onclick="viewPhoto('${student.id}', '${student.photo_url}')">
       </td>
@@ -383,6 +387,101 @@ function applyZoom() {
       container.style.overflow = 'visible';
     }
   }
+}
+
+// Toggle select all checkbox
+function toggleSelectAll() {
+  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+  const checkboxes = document.querySelectorAll('.student-checkbox');
+  
+  if (selectAllCheckbox.checked) {
+    checkboxes.forEach(cb => {
+      cb.checked = true;
+      selectedStudents.add(cb.value);
+    });
+  } else {
+    checkboxes.forEach(cb => {
+      cb.checked = false;
+      selectedStudents.delete(cb.value);
+    });
+  }
+  
+  updateSelectedStudents();
+}
+
+// Update selected students count and show/hide bulk actions
+function updateSelectedStudents() {
+  const checkboxes = document.querySelectorAll('.student-checkbox');
+  selectedStudents.clear();
+  
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      selectedStudents.add(cb.value);
+    }
+  });
+  
+  const bulkActions = document.getElementById('bulkActions');
+  const selectedCountDisplay = document.getElementById('selectedCount');
+  
+  if (selectedStudents.size > 0) {
+    bulkActions.style.display = 'flex';
+    selectedCountDisplay.textContent = `${selectedStudents.size} selected`;
+  } else {
+    bulkActions.style.display = 'none';
+    selectedCountDisplay.textContent = '0 selected';
+  }
+  
+  // Update select all checkbox state
+  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+  selectAllCheckbox.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+}
+
+// Bulk select all selected students
+async function bulkSelectStudents() {
+  if (selectedStudents.size === 0) {
+    alert('Please select students to confirm');
+    return;
+  }
+  
+  if (!confirm(`Are you sure you want to confirm ${selectedStudents.size} student(s)? They will all receive confirmation emails.`)) {
+    return;
+  }
+  
+  showLoader(`Processing ${selectedStudents.size} students...`);
+  
+  try {
+    const studentIds = Array.from(selectedStudents);
+    
+    // Send bulk selection request
+    const response = await fetch(`${API_URL}/api/bulk-select`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ studentIds })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showMessage(`✅ Successfully confirmed ${selectedStudents.size} student(s)! Emails sent.`, 'success');
+      clearSelectedStudents();
+      loadStudents();
+    } else {
+      showMessage(`❌ Error: ${data.error}`, 'error');
+    }
+  } catch (error) {
+    showMessage(`❌ Failed: ${error.message}`, 'error');
+  } finally {
+    hideLoader();
+  }
+}
+
+// Clear all selections
+function clearSelectedStudents() {
+  selectedStudents.clear();
+  document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('selectAllCheckbox').checked = false;
+  updateSelectedStudents();
 }
 
 // Close modals when clicking outside

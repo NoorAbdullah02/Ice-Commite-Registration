@@ -1,4 +1,3 @@
-// Ei file admin login handle kore
 
 // API Configuration - Auto-detect environment
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
