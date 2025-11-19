@@ -24,7 +24,7 @@ const RegistrationSchema = z.object({
 });
 
 // POST /api/register - student registration
-router.post('/register', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     // Validation
     const validated = RegistrationSchema.parse(req.body);
