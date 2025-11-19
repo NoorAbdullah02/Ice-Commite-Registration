@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
 
     // Registration email pathay
     try {
-      await sendRegistrationEmail(student.full_name, student.email);
+      await sendRegistrationEmail(student.full_name, student.email, student);
     } catch (emailError) {
       console.log('Email send failed (non-critical):', emailError.message);
       // Registration success, email fail hole bhi response success hobe

@@ -25,7 +25,25 @@ router.put('/:id', authMiddleware, async (req, res) => {
       'General Secretary',
       'Treasurer',
       'Organizing Secretary',
-      'Executive Member'
+      'Executive Member',
+      'Vice President (Technical)',
+      'Assistant General Secretary',
+      'Joint Secretary',
+      'Assistant Joint Secretary',
+      'Publicity Secretary (Outreach & Activation)',
+      'Publicity Secretary (Social Media Management)',
+      'Office Secretary (Resource Management)',
+      'Office Secretary (Event Management)',
+      'Financial Secretary',
+      'IT Secretary (Webmaster)',
+      'IT Secretary (Design & Creativity)',
+      'Executive Member (Logistics)',
+      'Executive Member (Cultural Activities)',
+      'Executive Member (Social Media Management)',
+      'Executive Member (Documentation)',
+      'Executive Member (Event Management)',
+      'Executive Member (IT & Gaming)',
+      'Secretary'
     ];
 
     if (!validPosts.includes(apply_for_post)) {

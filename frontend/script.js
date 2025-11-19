@@ -71,7 +71,7 @@ function initializeMobileMenu() {
 
 // Photo upload handling
 const photoInput = document.getElementById('photo');
-const photoUploadArea = document.getElementById('photoUploadArea');
+const photoUploadArea = document.getElementById('uploadArea');
 const photoPreview = document.getElementById('photoPreview');
 
 photoInput.addEventListener('change', handlePhotoSelect);
@@ -91,7 +91,7 @@ function previewPhoto(file) {
     photoPreview.style.display = 'block';
     
     // Hide upload content
-    const uploadContent = photoUploadArea.querySelector('.upload-content');
+    const uploadContent = photoUploadArea.querySelector('.upload-visual');
     if (uploadContent) {
       uploadContent.style.display = 'none';
     }
@@ -231,7 +231,8 @@ registrationForm.addEventListener('submit', async (e) => {
       note: document.getElementById('note').value.trim()
     };
 
-    console.log('Submitting registration data...');
+    console.log('📝 Form Data to Submit:', formData);
+    console.log('Submitting registration data to:', `${API_URL}/api/register`);
 
     // Submit registration
     const response = await fetch(`${API_URL}/api/register`, {
@@ -240,8 +241,9 @@ registrationForm.addEventListener('submit', async (e) => {
       body: JSON.stringify(formData)
     });
 
+    console.log('📊 Response Status:', response.status);
     const data = await response.json();
-    console.log('Registration response:', data);
+    console.log('📦 Registration response:', data);
 
     if (response.ok) {
       // Store data for success page
@@ -257,11 +259,15 @@ registrationForm.addEventListener('submit', async (e) => {
     } else {
       showMessage(`❌ Error: ${data.error || 'Registration failed'}`, 'error');
       hideLoader();
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
     }
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ Registration error:', error);
     showMessage(`❌ Registration failed: ${error.message}`, 'error');
     hideLoader();
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
   }
 });
 

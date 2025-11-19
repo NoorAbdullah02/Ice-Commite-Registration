@@ -35,7 +35,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Selection email pathay
     try {
-      await sendSelectionEmail(student.full_name, student.email, student.apply_for_post);
+      await sendSelectionEmail(student.full_name, student.email, student.apply_for_post, student);
     } catch (emailError) {
       console.log('Email send failed (non-critical):', emailError.message);
       // Student already selected, email fail hole bhi ok
@@ -82,7 +82,7 @@ router.post('/bulk', authMiddleware, async (req, res) => {
 
     for (const student of students) {
       try {
-        await sendSelectionEmail(student.full_name, student.email, student.apply_for_post);
+        await sendSelectionEmail(student.full_name, student.email, student.apply_for_post, student);
         emailSuccessCount++;
       } catch (emailError) {
         console.log(`Email failed for ${student.email}:`, emailError.message);
