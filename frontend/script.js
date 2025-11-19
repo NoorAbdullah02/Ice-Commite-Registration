@@ -1,5 +1,5 @@
 // ============================================
-// ICE COMMITTEE 2025 - JAVASCRIPT
+// ICE COMMITTEE 2025 - OPTIMIZED JAVASCRIPT
 // ============================================
 
 // API Configuration
@@ -11,6 +11,22 @@ const API_URL = isDevelopment
 console.log('🚀 ICE Committee 2025 - Initialized');
 console.log('🌐 Environment:', isDevelopment ? 'Development' : 'Production');
 console.log('🔗 API URL:', API_URL);
+
+// Performance optimization - Debounce function
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Check if user prefers reduced motion
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ============================================
 // INITIALIZATION
@@ -32,61 +48,90 @@ function initializeHeader() {
   const header = document.querySelector('.header-2025');
   const mobileToggle = document.getElementById('mobileToggle');
   
-  // Scroll effect for header
+  if (!header) return;
+  
+  // Optimized scroll effect for header
   let lastScroll = 0;
-  window.addEventListener('scroll', () => {
+  let ticking = false;
+  
+  const updateHeader = () => {
     const currentScroll = window.pageYOffset;
     
-    if (currentScroll > 100) {
-      header.style.padding = '1rem 0';
-      header.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+    if (currentScroll > 80) {
+      header.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
     } else {
-      header.style.padding = '1.5rem 0';
-      header.style.boxShadow = 'none';
+      header.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.02)';
     }
     
     lastScroll = currentScroll;
-  });
+    ticking = false;
+  };
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }, { passive: true });
   
   // Mobile menu toggle
   if (mobileToggle) {
     mobileToggle.addEventListener('click', () => {
       mobileToggle.classList.toggle('active');
-      // Add mobile menu functionality here if needed
+      const spans = mobileToggle.querySelectorAll('span');
+      
+      if (mobileToggle.classList.contains('active')) {
+        spans[0].style.transform = 'rotate(45deg) translateY(8px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translateY(-8px)';
+      } else {
+        spans[0].style.transform = 'none';
+        spans[1].style.opacity = '1';
+        spans[2].style.transform = 'none';
+      }
     });
   }
 }
 
 // ============================================
-// HERO ANIMATIONS
+// HERO ANIMATIONS - OPTIMIZED
 // ============================================
 function initializeHeroAnimations() {
-  // Parallax effect for hero
-  window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero-2025');
-    
-    if (hero && scrolled < window.innerHeight) {
-      hero.style.transform = `translateY(${scrolled * 0.4}px)`;
-      hero.style.opacity = 1 - (scrolled / 800);
-    }
-  });
+  if (prefersReducedMotion) return;
   
-  // Animate title words sequentially
-  const titleWords = document.querySelectorAll('.title-word');
-  titleWords.forEach((word, index) => {
-    word.style.animationDelay = `${0.2 + index * 0.2}s`;
-  });
+  const hero = document.querySelector('.hero-2025');
+  if (!hero) return;
+  
+  let ticking = false;
+  
+  // Optimized parallax effect
+  const updateParallax = () => {
+    const scrolled = window.pageYOffset;
+    
+    if (scrolled < window.innerHeight) {
+      hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+      hero.style.opacity = Math.max(1 - (scrolled / 600), 0);
+    }
+    
+    ticking = false;
+  };
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking && window.innerWidth > 768) {
+      window.requestAnimationFrame(updateParallax);
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 // ============================================
-// FORM ANIMATIONS
+// FORM ANIMATIONS - OPTIMIZED
 // ============================================
 function initializeFormAnimations() {
   // Intersection Observer for form elements
   const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.15,
+    rootMargin: '0px 0px -30px 0px'
   };
   
   const observer = new IntersectionObserver((entries) => {
@@ -94,6 +139,7 @@ function initializeFormAnimations() {
       if (entry.isIntersecting) {
         entry.target.style.opacity = '1';
         entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target); // Stop observing once animated
       }
     });
   }, observerOptions);
@@ -101,44 +147,45 @@ function initializeFormAnimations() {
   // Observe all input groups
   const inputGroups = document.querySelectorAll('.input-group');
   inputGroups.forEach((group, index) => {
-    group.style.opacity = '0';
-    group.style.transform = 'translateY(30px)';
-    group.style.transition = `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
+    if (!prefersReducedMotion) {
+      group.style.opacity = '0';
+      group.style.transform = 'translateY(20px)';
+      group.style.transition = `all 0.5s ease ${index * 0.08}s`;
+    }
     observer.observe(group);
   });
   
-  // Input focus effects
+  // Input focus effects - optimized
   const inputs = document.querySelectorAll('input, select, textarea');
   inputs.forEach(input => {
+    // Focus effect
     input.addEventListener('focus', function() {
-      this.parentElement.style.transform = 'translateY(-2px)';
-      
-      // Add glow effect
-      const inputContainer = this.closest('.input-container');
-      if (inputContainer) {
-        inputContainer.style.transition = 'all 0.3s ease';
-      }
+      this.setAttribute('data-focused', 'true');
     });
     
     input.addEventListener('blur', function() {
-      this.parentElement.style.transform = 'translateY(0)';
+      this.removeAttribute('data-focused');
     });
     
-    // Real-time validation styling
-    input.addEventListener('input', function() {
-      if (this.value.length > 0 && this.checkValidity()) {
-        this.style.borderColor = 'var(--success)';
-      } else if (this.value.length > 0) {
-        this.style.borderColor = 'var(--error)';
+    // Real-time validation styling with debounce
+    const validateInput = debounce(function() {
+      if (this.value.length > 0) {
+        if (this.checkValidity()) {
+          this.style.borderColor = '#10b981';
+        } else {
+          this.style.borderColor = '#ef4444';
+        }
       } else {
-        this.style.borderColor = 'transparent';
+        this.style.borderColor = '#e2e8f0';
       }
-    });
+    }, 300);
+    
+    input.addEventListener('input', validateInput);
   });
 }
 
 // ============================================
-// PHOTO UPLOAD
+// PHOTO UPLOAD - IMPROVED
 // ============================================
 function initializePhotoUpload() {
   const photoInput = document.getElementById('photo');
@@ -150,30 +197,44 @@ function initializePhotoUpload() {
   // File input change
   photoInput.addEventListener('change', handlePhotoSelect);
   
-  // Drag and drop
-  uploadArea.addEventListener('dragover', (e) => {
+  // Drag and drop - with better visual feedback
+  let dragCounter = 0;
+  
+  uploadArea.addEventListener('dragenter', (e) => {
     e.preventDefault();
-    uploadArea.style.borderColor = 'var(--primary)';
-    uploadArea.style.transform = 'scale(1.05)';
-    uploadArea.style.boxShadow = '0 16px 48px rgba(102, 126, 234, 0.2)';
+    dragCounter++;
+    uploadArea.style.borderColor = '#6366f1';
+    uploadArea.style.transform = 'scale(1.02)';
+    uploadArea.style.boxShadow = '0 12px 32px rgba(99, 102, 241, 0.2)';
   });
   
   uploadArea.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    uploadArea.style.borderColor = '#cbd5e0';
-    uploadArea.style.transform = 'scale(1)';
-    uploadArea.style.boxShadow = 'none';
+    dragCounter--;
+    if (dragCounter === 0) {
+      uploadArea.style.borderColor = '#cbd5e0';
+      uploadArea.style.transform = 'scale(1)';
+      uploadArea.style.boxShadow = 'none';
+    }
+  });
+  
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
   });
   
   uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
+    dragCounter = 0;
     uploadArea.style.borderColor = '#cbd5e0';
     uploadArea.style.transform = 'scale(1)';
     uploadArea.style.boxShadow = 'none';
     
     const file = e.dataTransfer.files[0];
     if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
-      photoInput.files = e.dataTransfer.files;
+      // Create a new FileList-like object
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      photoInput.files = dataTransfer.files;
       previewPhoto(file);
     } else {
       showMessage('⚠️ Please upload a JPG or PNG image', 'error');
@@ -214,8 +275,13 @@ function initializePhotoUpload() {
         uploadVisual.style.display = 'none';
       }
       
-      // Add success border
-      uploadArea.style.borderColor = 'var(--success)';
+      // Add success styling
+      uploadArea.style.borderColor = '#10b981';
+      uploadArea.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+    };
+    
+    reader.onerror = () => {
+      showMessage('⚠️ Failed to read the image file', 'error');
     };
     
     reader.readAsDataURL(file);
@@ -223,34 +289,36 @@ function initializePhotoUpload() {
 }
 
 // ============================================
-// FORM VALIDATION
+// FORM VALIDATION - ENHANCED
 // ============================================
 function initializeFormValidation() {
   const emailInput = document.getElementById('email');
   const phoneInput = document.getElementById('phone');
   
-  // Email validation
+  // Email validation with debounce
   if (emailInput) {
-    emailInput.addEventListener('blur', function() {
+    const validateEmailInput = debounce(function() {
       if (this.value && !validateEmail(this.value)) {
-        this.style.borderColor = 'var(--error)';
-        showMessage('⚠️ Please enter a valid email address', 'error');
+        this.style.borderColor = '#ef4444';
       } else if (this.value) {
-        this.style.borderColor = 'var(--success)';
+        this.style.borderColor = '#10b981';
       }
-    });
+    }, 500);
+    
+    emailInput.addEventListener('input', validateEmailInput);
   }
   
-  // Phone validation
+  // Phone validation with debounce
   if (phoneInput) {
-    phoneInput.addEventListener('blur', function() {
+    const validatePhoneInput = debounce(function() {
       if (this.value && !validatePhone(this.value)) {
-        this.style.borderColor = 'var(--error)';
-        showMessage('⚠️ Please enter a valid phone number (e.g., 01748269350)', 'error');
+        this.style.borderColor = '#ef4444';
       } else if (this.value) {
-        this.style.borderColor = 'var(--success)';
+        this.style.borderColor = '#10b981';
       }
-    });
+    }, 500);
+    
+    phoneInput.addEventListener('input', validatePhoneInput);
   }
   
   // Character counter for note
@@ -259,25 +327,30 @@ function initializeFormValidation() {
     const counterDiv = document.createElement('div');
     counterDiv.style.cssText = `
       text-align: right;
-      font-size: 0.875rem;
-      color: #64748b;
+      font-size: 0.85rem;
+      color: #94a3b8;
       margin-top: 0.5rem;
-      font-weight: 500;
+      font-weight: 600;
     `;
     noteTextarea.parentElement.appendChild(counterDiv);
     
-    noteTextarea.addEventListener('input', function() {
-      const count = this.value.length;
+    const updateCounter = () => {
+      const count = noteTextarea.value.length;
       const max = 500;
       counterDiv.textContent = `${count}/${max} characters`;
       
       if (count > max) {
-        this.value = this.value.substring(0, max);
-        counterDiv.style.color = 'var(--error)';
+        noteTextarea.value = noteTextarea.value.substring(0, max);
+        counterDiv.style.color = '#ef4444';
+      } else if (count > max * 0.9) {
+        counterDiv.style.color = '#f59e0b';
       } else {
-        counterDiv.style.color = '#64748b';
+        counterDiv.style.color = '#94a3b8';
       }
-    });
+    };
+    
+    noteTextarea.addEventListener('input', updateCounter);
+    updateCounter(); // Initialize
   }
 }
 
@@ -294,7 +367,7 @@ function validatePhone(phone) {
 }
 
 // ============================================
-// FORM SUBMISSION
+// FORM SUBMISSION - IMPROVED ERROR HANDLING
 // ============================================
 function initializeFormSubmission() {
   const form = document.getElementById('registrationForm');
@@ -314,9 +387,15 @@ function initializeFormSubmission() {
     loaderContainer.style.display = 'block';
     submitBtn.disabled = true;
     submitBtn.style.opacity = '0.6';
+    submitBtn.style.cursor = 'not-allowed';
+    
+    // Scroll to top of form
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
     // Validate all fields
-    if (!validateForm()) {
+    const validation = validateForm();
+    if (!validation.isValid) {
+      showMessage(validation.message, 'error');
       hideLoader();
       return;
     }
@@ -327,6 +406,7 @@ function initializeFormSubmission() {
       // Upload photo first
       const photoFile = document.getElementById('photo').files[0];
       console.log('📸 Uploading photo:', photoFile.name);
+      
       const photoUrl = await uploadPhoto(photoFile);
       console.log('✅ Photo uploaded:', photoUrl);
       
@@ -346,13 +426,18 @@ function initializeFormSubmission() {
       
       console.log('📤 Submitting registration...');
       
-      // Submit registration
+      // Submit registration with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       const data = await response.json();
       console.log('📥 Response received:', data);
       
@@ -363,7 +448,9 @@ function initializeFormSubmission() {
         showMessage('✅ Registration successful! Redirecting...', 'success');
         
         // Add celebration effect
-        createConfetti();
+        if (!prefersReducedMotion) {
+          createConfetti();
+        }
         
         // Redirect after delay
         setTimeout(() => {
@@ -371,11 +458,22 @@ function initializeFormSubmission() {
           window.location.href = '/success.html';
         }, 2000);
       } else {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('❌ Registration error:', error);
-      showMessage(`❌ Registration failed: ${error.message}`, 'error');
+      
+      let errorMessage = '❌ Registration failed. ';
+      
+      if (error.name === 'AbortError') {
+        errorMessage += 'Request timed out. Please check your internet connection and try again.';
+      } else if (!navigator.onLine) {
+        errorMessage += 'No internet connection. Please check your network and try again.';
+      } else {
+        errorMessage += error.message || 'Please try again later.';
+      }
+      
+      showMessage(errorMessage, 'error');
       hideLoader();
     }
   });
@@ -385,35 +483,40 @@ function validateForm() {
   const photoFile = document.getElementById('photo').files[0];
   
   if (!photoFile) {
-    showMessage('⚠️ Please select a profile photo', 'error');
-    return false;
+    return { isValid: false, message: '⚠️ Please select a profile photo' };
   }
   
   if (photoFile.size > 3 * 1024 * 1024) {
-    showMessage('⚠️ Photo size must be less than 3MB', 'error');
-    return false;
+    return { isValid: false, message: '⚠️ Photo size must be less than 3MB' };
   }
   
   const validExtensions = ['jpg', 'jpeg', 'png'];
   const fileExtension = photoFile.name.split('.').pop().toLowerCase();
   if (!validExtensions.includes(fileExtension)) {
-    showMessage('⚠️ Only JPG and PNG files are allowed', 'error');
-    return false;
+    return { isValid: false, message: '⚠️ Only JPG and PNG files are allowed' };
   }
   
   const phone = document.getElementById('phone').value.trim();
   if (!validatePhone(phone)) {
-    showMessage('⚠️ Please enter a valid phone number', 'error');
-    return false;
+    return { isValid: false, message: '⚠️ Please enter a valid phone number (e.g., 01748269350)' };
   }
   
   const email = document.getElementById('email').value.trim();
   if (!validateEmail(email)) {
-    showMessage('⚠️ Please enter a valid email address', 'error');
-    return false;
+    return { isValid: false, message: '⚠️ Please enter a valid email address' };
   }
   
-  return true;
+  const fullName = document.getElementById('full_name').value.trim();
+  if (fullName.length < 3) {
+    return { isValid: false, message: '⚠️ Please enter your full name (at least 3 characters)' };
+  }
+  
+  const idNo = document.getElementById('ID_no').value.trim();
+  if (idNo.length < 3) {
+    return { isValid: false, message: '⚠️ Please enter a valid ID number' };
+  }
+  
+  return { isValid: true };
 }
 
 async function uploadPhoto(file) {
@@ -423,11 +526,17 @@ async function uploadPhoto(file) {
   console.log('📸 Uploading to:', `${API_URL}/api/upload`);
   
   try {
+    // Add timeout for upload
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for upload
+    
     const response = await fetch(`${API_URL}/api/upload`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      signal: controller.signal
     });
     
+    clearTimeout(timeoutId);
     const data = await response.json();
     
     if (response.ok) {
@@ -437,6 +546,10 @@ async function uploadPhoto(file) {
     }
   } catch (error) {
     console.error('❌ Upload error:', error);
+    
+    if (error.name === 'AbortError') {
+      throw new Error('Photo upload timed out. Please try with a smaller image.');
+    }
     throw new Error(`Photo upload failed: ${error.message}`);
   }
 }
@@ -457,14 +570,21 @@ function showMessage(message, type) {
   `;
   
   // Smooth scroll to message
-  container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  setTimeout(() => {
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
   
-  // Auto-hide success messages
-  if (type === 'success') {
-    setTimeout(() => {
-      container.innerHTML = '';
-    }, 5000);
-  }
+  // Auto-hide messages after 8 seconds
+  setTimeout(() => {
+    if (container.innerHTML) {
+      container.style.opacity = '0';
+      container.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => {
+        container.innerHTML = '';
+        container.style.opacity = '1';
+      }, 500);
+    }
+  }, 8000);
 }
 
 function hideLoader() {
@@ -474,47 +594,54 @@ function hideLoader() {
   loaderContainer.style.display = 'none';
   submitBtn.disabled = false;
   submitBtn.style.opacity = '1';
+  submitBtn.style.cursor = 'pointer';
 }
 
 // ============================================
-// CONFETTI EFFECT
+// CONFETTI EFFECT - OPTIMIZED
 // ============================================
 function createConfetti() {
-  const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe'];
-  const confettiCount = 50;
+  const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'];
+  const confettiCount = window.innerWidth < 768 ? 30 : 50; // Less on mobile
   
   for (let i = 0; i < confettiCount; i++) {
     const confetti = document.createElement('div');
+    const size = Math.random() * 8 + 4;
+    
     confetti.style.cssText = `
       position: fixed;
-      width: 10px;
-      height: 10px;
+      width: ${size}px;
+      height: ${size}px;
       background: ${colors[Math.floor(Math.random() * colors.length)]};
       top: -10px;
       left: ${Math.random() * 100}vw;
-      opacity: ${Math.random()};
-      transform: rotate(${Math.random() * 360}deg);
-      animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
+      opacity: ${Math.random() * 0.8 + 0.2};
+      border-radius: 50%;
+      animation: confettiFall ${2 + Math.random() * 2}s linear forwards;
       z-index: 9999;
       pointer-events: none;
+      will-change: transform, opacity;
     `;
     document.body.appendChild(confetti);
     
-    setTimeout(() => confetti.remove(), 5000);
+    setTimeout(() => confetti.remove(), 4500);
   }
 }
 
 // Add confetti animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes confettiFall {
-    to {
-      transform: translateY(100vh) rotate(${Math.random() * 720}deg);
-      opacity: 0;
+if (!document.getElementById('confetti-styles')) {
+  const style = document.createElement('style');
+  style.id = 'confetti-styles';
+  style.textContent = `
+    @keyframes confettiFall {
+      to {
+        transform: translateY(100vh) rotate(${Math.random() * 720}deg);
+        opacity: 0;
+      }
     }
-  }
-`;
-document.head.appendChild(style);
+  `;
+  document.head.appendChild(style);
+}
 
 // ============================================
 // SMOOTH SCROLLING
@@ -530,6 +657,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       });
     }
   });
+});
+
+// ============================================
+// NETWORK STATUS INDICATOR
+// ============================================
+window.addEventListener('online', () => {
+  console.log('✅ Network connection restored');
+});
+
+window.addEventListener('offline', () => {
+  console.log('⚠️ Network connection lost');
+  showMessage('⚠️ No internet connection. Please check your network.', 'error');
 });
 
 console.log('🎉 ICE Committee 2025 - Ready!');
