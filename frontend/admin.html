@@ -6,8 +6,7 @@
   <title>Admin Dashboard - ICE Committee</title>
   <link rel="stylesheet" href="style_admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="images/jepg" href="images/depLogo.png">
-
+  <link rel="icon" type="image/jpeg" href="images/depLogo.png">
 </head>
 <body>
   <div class="admin-container">
@@ -95,17 +94,17 @@
         <div class="filter-group">
           <select id="batchFilter" onchange="filterStudents()" class="filter-select">
             <option value="">All Batches</option>
-                    <option value="12">12th</option>
-                    <option value="13">13th</option>
-                    <option value="14">14th</option>
-                    <option value="15">15th</option>
-                    <option value="16">16th</option>
-                    <option value="17">17th</option>
-                    <option value="18">18th</option>
-                    <option value="19">19th</option>
-                    <option value="20">20th</option>
-                    <option value="21">21th</option>
-                    <option value="22">22th</option>
+            <option value="12">12th</option>
+            <option value="13">13th</option>
+            <option value="14">14th</option>
+            <option value="15">15th</option>
+            <option value="16">16th</option>
+            <option value="17">17th</option>
+            <option value="18">18th</option>
+            <option value="19">19th</option>
+            <option value="20">20th</option>
+            <option value="21">21st</option>
+            <option value="22">22nd</option>
           </select>
           
           <select id="postFilter" onchange="filterStudents()" class="filter-select">
@@ -147,13 +146,13 @@
 
     <!-- Students table -->
     <div class="table-container">
-      <div class="bulk-actions" id="bulkActions" style="display: none; margin-bottom: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div class="bulk-actions" id="bulkActions" style="display: none;">
         <div>
-          <span id="selectedCount" style="font-weight: 600;">0 selected</span>
+          <span id="bulkSelectedCount" style="font-weight: 600;">0 selected</span>
         </div>
         <div>
-          <button class="btn-confirm" onclick="bulkSelectStudents()" style="background: #fff; color: #667eea; padding: 8px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 10px;">✓ Confirm All</button>
-          <button class="btn-cancel" onclick="clearSelectedStudents()" style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border: 1px solid white; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+          <button class="btn-confirm" onclick="bulkSelectStudents()">✓ Confirm All</button>
+          <button class="btn-cancel" onclick="clearSelectedStudents()">Cancel</button>
         </div>
       </div>
 
@@ -176,7 +175,7 @@
           </thead>
           <tbody id="tableBody">
             <tr>
-              <td colspan="8" style="text-align: center; padding: 40px;">
+              <td colspan="9" style="text-align: center; padding: 40px;">
                 <div class="loading-spinner"></div>
                 <p style="margin-top: 15px; color: #666;">Loading students...</p>
               </td>
@@ -199,7 +198,7 @@
       <div class="profile-layout">
         <div class="profile-image-section">
           <div id="imageContainer" class="image-container">
-            <img id="modalPhoto" src="" class="zoomable-image">
+            <img id="modalPhoto" src="" alt="Student Photo" class="zoomable-image">
             
             <div class="zoom-controls">
               <button onclick="zoomOut()" class="zoom-btn">➖</button>

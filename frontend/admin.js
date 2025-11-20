@@ -1,4 +1,4 @@
-// Admin Dashboard JavaScript
+// Admin Dashboard JavaScript - Fixed Version
 // Manages all admin functionality
 
 // API Configuration - Auto-detect environment
@@ -11,8 +11,7 @@ console.log('🌐 Environment:', isDevelopment ? 'Development' : 'Production');
 console.log('🌐 Hostname:', window.location.hostname);
 console.log('🌐 API URL:', API_URL);
 
-
-
+// Global variables
 let allStudents = [];
 let studentToDelete = null;
 let studentToEditPost = null;
@@ -21,8 +20,8 @@ let selectedStudents = new Set(); // Track selected students for bulk action
 // Load students when page loads
 document.addEventListener('DOMContentLoaded', () => {
   loadStudents();
-  // Auto-refresh every 10 seconds
-  setInterval(loadStudents, 10000);
+  // Auto-refresh every 30 seconds (reduced from 10 for better performance)
+  setInterval(loadStudents, 30000);
 });
 
 // Load students from API
@@ -50,8 +49,11 @@ async function loadStudents() {
 
       // Display students in table
       displayStudents(allStudents);
+    } else {
+      showMessage(`❌ Error: ${data.error || 'Failed to load students'}`, 'error');
     }
   } catch (error) {
+    console.error('Load students error:', error);
     showMessage(`❌ Failed to load students: ${error.message}`, 'error');
   }
 }
@@ -59,6 +61,8 @@ async function loadStudents() {
 // Animate number counting
 function animateNumber(elementId, targetNumber) {
   const element = document.getElementById(elementId);
+  if (!element) return;
+  
   const currentNumber = parseInt(element.textContent) || 0;
   const increment = targetNumber > currentNumber ? 1 : -1;
   const duration = 500;
@@ -81,6 +85,11 @@ function animateNumber(elementId, targetNumber) {
 function displayStudents(students) {
   const tbody = document.getElementById('tableBody');
   
+  if (!tbody) {
+    console.error('Table body element not found');
+    return;
+  }
+  
   if (students.length === 0) {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;"><div style="color: #94a3b8; font-size: 16px;">📭 No students found</div></td></tr>';
     return;
@@ -92,7 +101,7 @@ function displayStudents(students) {
         <input type="checkbox" class="student-checkbox" value="${student.id}" onchange="updateSelectedStudents()">
       </td>
       <td>
-        <img src="${student.photo_url}" alt="Photo" class="photo-thumb" onclick="viewPhoto('${student.id}', '${student.photo_url}')">
+        <img src="${escapeHtml(student.photo_url)}" alt="Photo" class="photo-thumb" onclick="viewPhoto('${student.id}', '${escapeHtml(student.photo_url)}')">
       </td>
       <td><strong>${escapeHtml(student.full_name)}</strong></td>
       <td>${escapeHtml(student.ID_no)}</td>
@@ -105,7 +114,7 @@ function displayStudents(students) {
         </span>
       </td>
       <td style="white-space: nowrap;">
-        <button class="button" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 8px 14px; font-size: 12px;" onclick="editPostModal('${student.id}', '${student.full_name}', '${student.apply_for_post}')">✏️ Edit</button>
+        <button class="button" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 8px 14px; font-size: 12px;" onclick="editPostModal('${student.id}', '${escapeHtml(student.full_name)}', '${escapeHtml(student.apply_for_post)}')">✏️ Edit</button>
         ${!student.selected ? `
           <button class="button success" onclick="selectStudent('${student.id}', '${escapeHtml(student.full_name)}')">✓ Select</button>
         ` : ''}
@@ -117,10 +126,20 @@ function displayStudents(students) {
 
 // Filter students based on search and filters
 function filterStudents() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const post = document.getElementById('postFilter').value;
-  const status = document.getElementById('statusFilter').value;
-  const batch = document.getElementById('batchFilter').value;
+  const searchInput = document.getElementById('searchInput');
+  const postFilter = document.getElementById('postFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const batchFilter = document.getElementById('batchFilter');
+  
+  if (!searchInput || !postFilter || !statusFilter || !batchFilter) {
+    console.error('Filter elements not found');
+    return;
+  }
+  
+  const search = searchInput.value.toLowerCase();
+  const post = postFilter.value;
+  const status = statusFilter.value;
+  const batch = batchFilter.value;
 
   const filtered = allStudents.filter(student => {
     const matchSearch = !search || 
@@ -158,13 +177,14 @@ async function selectStudent(studentId, studentName) {
 
     const data = await response.json();
 
-    if (response.ok) {
+    if (response.ok && data.success) {
       showMessage(`✅ ${studentName} has been selected! Confirmation email sent.`, 'success');
-      loadStudents();
+      await loadStudents();
     } else {
-      showMessage(`❌ Error: ${data.error}`, 'error');
+      showMessage(`❌ Error: ${data.error || 'Selection failed'}`, 'error');
     }
   } catch (error) {
+    console.error('Select student error:', error);
     showMessage(`❌ Failed: ${error.message}`, 'error');
   } finally {
     hideLoader();
@@ -174,7 +194,10 @@ async function selectStudent(studentId, studentName) {
 // Show delete confirmation modal
 function deleteStudent(studentId) {
   studentToDelete = studentId;
-  document.getElementById('deleteModal').classList.add('show');
+  const modal = document.getElementById('deleteModal');
+  if (modal) {
+    modal.classList.add('show');
+  }
 }
 
 // Confirm and delete student
@@ -191,14 +214,15 @@ async function confirmDelete() {
 
     const data = await response.json();
 
-    if (response.ok) {
+    if (response.ok && data.success) {
       showMessage('✅ Student deleted successfully', 'success');
       closeDeleteModal();
-      loadStudents();
+      await loadStudents();
     } else {
-      showMessage(`❌ Error: ${data.error}`, 'error');
+      showMessage(`❌ Error: ${data.error || 'Delete failed'}`, 'error');
     }
   } catch (error) {
+    console.error('Delete student error:', error);
     showMessage(`❌ Delete failed: ${error.message}`, 'error');
   } finally {
     hideLoader();
@@ -207,7 +231,10 @@ async function confirmDelete() {
 
 // Close delete modal
 function closeDeleteModal() {
-  document.getElementById('deleteModal').classList.remove('show');
+  const modal = document.getElementById('deleteModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
   studentToDelete = null;
 }
 
@@ -215,41 +242,84 @@ function closeDeleteModal() {
 function viewPhoto(id, photoUrl) {
   const student = allStudents.find(s => s.id === id);
   
-  if (student) {
-    document.getElementById('modalPhoto').src = photoUrl;
-    document.getElementById('detailFullName').textContent = escapeHtml(student.full_name || '-');
-    document.getElementById('detailID').textContent = escapeHtml(student.ID_no || '-');
-    document.getElementById('detailBatch').textContent = student.batch ? `Batch ${escapeHtml(student.batch)}` : 'N/A';
-    document.getElementById('detailEmail').textContent = escapeHtml(student.email || '-');
-    document.getElementById('detailPhone').textContent = escapeHtml(student.phone || '-');
-    document.getElementById('detailDept').textContent = escapeHtml(student.department || '-');
-    document.getElementById('detailGender').textContent = escapeHtml(student.gender || 'Not specified');
-    document.getElementById('detailPost').textContent = escapeHtml(student.apply_for_post || '-');
-    document.getElementById('detailStatus').innerHTML = `<span class="badge ${student.selected ? 'selected' : 'pending'}">${student.selected ? '✓ Selected' : '⏳ Pending'}</span>`;
-    document.getElementById('detailNote').textContent = escapeHtml(student.note || 'No note available');
+  if (!student) {
+    console.error('Student not found');
+    return;
   }
   
+  // Set photo
+  const modalPhoto = document.getElementById('modalPhoto');
+  if (modalPhoto) {
+    modalPhoto.src = photoUrl;
+  }
+  
+  // Set details
+  setElementText('detailFullName', student.full_name || '-');
+  setElementText('detailID', student.ID_no || '-');
+  setElementText('detailBatch', student.batch ? `Batch ${student.batch}` : 'N/A');
+  setElementText('detailEmail', student.email || '-');
+  setElementText('detailPhone', student.phone || '-');
+  setElementText('detailDept', student.department || '-');
+  setElementText('detailGender', student.gender || 'Not specified');
+  setElementText('detailPost', student.apply_for_post || '-');
+  
+  const statusElement = document.getElementById('detailStatus');
+  if (statusElement) {
+    statusElement.innerHTML = `<span class="badge ${student.selected ? 'selected' : 'pending'}">${student.selected ? '✓ Selected' : '⏳ Pending'}</span>`;
+  }
+  
+  setElementText('detailNote', student.note || 'No note available');
+  
   resetZoom();
-  document.getElementById('photoModal').classList.add('show');
+  const modal = document.getElementById('photoModal');
+  if (modal) {
+    modal.classList.add('show');
+  }
+}
+
+// Helper function to safely set element text
+function setElementText(elementId, text) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = escapeHtml(text);
+  }
 }
 
 // Close photo modal
 function closeModal() {
-  document.getElementById('photoModal').classList.remove('show');
+  const modal = document.getElementById('photoModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
   resetZoom();
 }
 
 // Show edit post modal
 function editPostModal(studentId, studentName, currentPost) {
   studentToEditPost = { id: studentId, currentPost };
-  document.getElementById('editStudentName').textContent = `Student: ${escapeHtml(studentName)} (Current Position: ${escapeHtml(currentPost)})`;
-  document.getElementById('newPost').value = '';
-  document.getElementById('editPostModal').classList.add('show');
+  
+  const nameElement = document.getElementById('editStudentName');
+  if (nameElement) {
+    nameElement.textContent = `Student: ${studentName} (Current Position: ${currentPost})`;
+  }
+  
+  const postSelect = document.getElementById('newPost');
+  if (postSelect) {
+    postSelect.value = '';
+  }
+  
+  const modal = document.getElementById('editPostModal');
+  if (modal) {
+    modal.classList.add('show');
+  }
 }
 
 // Close edit post modal
 function closeEditPostModal() {
-  document.getElementById('editPostModal').classList.remove('show');
+  const modal = document.getElementById('editPostModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
   studentToEditPost = null;
 }
 
@@ -257,7 +327,10 @@ function closeEditPostModal() {
 async function confirmEditPost() {
   if (!studentToEditPost) return;
 
-  const newPost = document.getElementById('newPost').value;
+  const postSelect = document.getElementById('newPost');
+  if (!postSelect) return;
+  
+  const newPost = postSelect.value;
   if (!newPost) {
     alert('Please select a position');
     return;
@@ -275,14 +348,15 @@ async function confirmEditPost() {
 
     const data = await response.json();
 
-    if (response.ok) {
+    if (response.ok && data.success) {
       showMessage(`✅ Position updated to ${newPost}! Email notification sent.`, 'success');
       closeEditPostModal();
-      loadStudents();
+      await loadStudents();
     } else {
-      showMessage(`❌ Error: ${data.error}`, 'error');
+      showMessage(`❌ Error: ${data.error || 'Update failed'}`, 'error');
     }
   } catch (error) {
+    console.error('Update post error:', error);
     showMessage(`❌ Failed: ${error.message}`, 'error');
   } finally {
     hideLoader();
@@ -308,6 +382,8 @@ async function logout() {
 // Show message notification
 function showMessage(message, type) {
   const container = document.getElementById('messageContainer');
+  if (!container) return;
+  
   const className = type === 'error' ? 'error-message' : 'success-message';
   container.innerHTML = `<div class="${className}">${message}</div>`;
   
@@ -318,21 +394,28 @@ function showMessage(message, type) {
 
 // Show loader overlay
 function showLoader(message = 'Processing...') {
+  // Remove existing loader if any
+  hideLoader();
+  
   const loaderDiv = document.createElement('div');
   loaderDiv.id = 'loaderOverlay';
   loaderDiv.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 9999;';
-  loaderDiv.innerHTML = `<div class="loader-container"><div class="spinner"></div><p>${message}</p></div>`;
+  loaderDiv.innerHTML = `<div class="loader-container"><div class="spinner"></div><p>${escapeHtml(message)}</p></div>`;
   document.body.appendChild(loaderDiv);
 }
 
 // Hide loader overlay
 function hideLoader() {
   const overlay = document.getElementById('loaderOverlay');
-  if (overlay) overlay.remove();
+  if (overlay) {
+    overlay.remove();
+  }
 }
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
+  
   const map = {
     '&': '&amp;',
     '<': '&lt;',
@@ -371,21 +454,22 @@ function resetZoom() {
 function applyZoom() {
   const img = document.getElementById('modalPhoto');
   const container = document.getElementById('imageContainer');
+  const zoomLevel = document.getElementById('zoomLevel');
   
-  if (img) {
-    img.style.transform = `scale(${currentZoom / 100})`;
-    img.style.transformOrigin = 'center top';
-    img.style.transition = 'transform 0.2s ease';
-    
-    document.getElementById('zoomLevel').textContent = currentZoom + '%';
-    
-    if (currentZoom > 100) {
-      container.style.maxHeight = (currentZoom / 100) * 400 + 'px';
-      container.style.overflow = 'auto';
-    } else {
-      container.style.maxHeight = 'auto';
-      container.style.overflow = 'visible';
-    }
+  if (!img || !container || !zoomLevel) return;
+  
+  img.style.transform = `scale(${currentZoom / 100})`;
+  img.style.transformOrigin = 'center top';
+  img.style.transition = 'transform 0.2s ease';
+  
+  zoomLevel.textContent = currentZoom + '%';
+  
+  if (currentZoom > 100) {
+    container.style.maxHeight = (currentZoom / 100) * 400 + 'px';
+    container.style.overflow = 'auto';
+  } else {
+    container.style.maxHeight = 'auto';
+    container.style.overflow = 'visible';
   }
 }
 
@@ -393,6 +477,8 @@ function applyZoom() {
 function toggleSelectAll() {
   const selectAllCheckbox = document.getElementById('selectAllCheckbox');
   const checkboxes = document.querySelectorAll('.student-checkbox');
+  
+  if (!selectAllCheckbox) return;
   
   if (selectAllCheckbox.checked) {
     checkboxes.forEach(cb => {
@@ -421,7 +507,9 @@ function updateSelectedStudents() {
   });
   
   const bulkActions = document.getElementById('bulkActions');
-  const selectedCountDisplay = document.getElementById('selectedCount');
+  const selectedCountDisplay = document.getElementById('bulkSelectedCount');
+  
+  if (!bulkActions || !selectedCountDisplay) return;
   
   if (selectedStudents.size > 0) {
     bulkActions.style.display = 'flex';
@@ -433,7 +521,9 @@ function updateSelectedStudents() {
   
   // Update select all checkbox state
   const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-  selectAllCheckbox.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+  if (selectAllCheckbox) {
+    selectAllCheckbox.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+  }
 }
 
 // Bulk select all selected students
@@ -453,7 +543,7 @@ async function bulkSelectStudents() {
     const studentIds = Array.from(selectedStudents);
     
     // Send bulk selection request
-    const response = await fetch(`${API_URL}/api/bulk-select`, {
+    const response = await fetch(`${API_URL}/api/select/bulk`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -462,14 +552,15 @@ async function bulkSelectStudents() {
     
     const data = await response.json();
     
-    if (response.ok) {
+    if (response.ok && data.success) {
       showMessage(`✅ Successfully confirmed ${selectedStudents.size} student(s)! Emails sent.`, 'success');
       clearSelectedStudents();
-      loadStudents();
+      await loadStudents();
     } else {
-      showMessage(`❌ Error: ${data.error}`, 'error');
+      showMessage(`❌ Error: ${data.error || 'Bulk selection failed'}`, 'error');
     }
   } catch (error) {
+    console.error('Bulk select error:', error);
     showMessage(`❌ Failed: ${error.message}`, 'error');
   } finally {
     hideLoader();
@@ -479,21 +570,32 @@ async function bulkSelectStudents() {
 // Clear all selections
 function clearSelectedStudents() {
   selectedStudents.clear();
-  document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = false);
-  document.getElementById('selectAllCheckbox').checked = false;
+  
+  const checkboxes = document.querySelectorAll('.student-checkbox');
+  checkboxes.forEach(cb => cb.checked = false);
+  
+  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+  if (selectAllCheckbox) {
+    selectAllCheckbox.checked = false;
+  }
+  
   updateSelectedStudents();
 }
 
 // Close modals when clicking outside
 document.addEventListener('click', (e) => {
   if (e.target.classList.contains('modal-backdrop')) {
-    if (document.getElementById('photoModal').classList.contains('show')) {
+    const photoModal = document.getElementById('photoModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const editPostModal = document.getElementById('editPostModal');
+    
+    if (photoModal && photoModal.classList.contains('show')) {
       closeModal();
     }
-    if (document.getElementById('deleteModal').classList.contains('show')) {
+    if (deleteModal && deleteModal.classList.contains('show')) {
       closeDeleteModal();
     }
-    if (document.getElementById('editPostModal').classList.contains('show')) {
+    if (editPostModal && editPostModal.classList.contains('show')) {
       closeEditPostModal();
     }
   }
@@ -501,21 +603,25 @@ document.addEventListener('click', (e) => {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+  const photoModal = document.getElementById('photoModal');
+  const deleteModal = document.getElementById('deleteModal');
+  const editPostModal = document.getElementById('editPostModal');
+  
   // ESC key to close modals
   if (e.key === 'Escape') {
-    if (document.getElementById('photoModal').classList.contains('show')) {
+    if (photoModal && photoModal.classList.contains('show')) {
       closeModal();
     }
-    if (document.getElementById('deleteModal').classList.contains('show')) {
+    if (deleteModal && deleteModal.classList.contains('show')) {
       closeDeleteModal();
     }
-    if (document.getElementById('editPostModal').classList.contains('show')) {
+    if (editPostModal && editPostModal.classList.contains('show')) {
       closeEditPostModal();
     }
   }
   
   // Zoom controls when photo modal is open
-  if (document.getElementById('photoModal').classList.contains('show')) {
+  if (photoModal && photoModal.classList.contains('show')) {
     if (e.key === '+' || e.key === '=') {
       e.preventDefault();
       zoomIn();
