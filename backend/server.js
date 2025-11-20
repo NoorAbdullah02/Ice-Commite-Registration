@@ -24,8 +24,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware - CORS Configuration
-// Using `origin: true` reflects the request's origin.
-// This is a permissive but effective way to handle CORS, especially for development.
 app.use(cors({
   origin: true,
   credentials: true // cookies allow kore
