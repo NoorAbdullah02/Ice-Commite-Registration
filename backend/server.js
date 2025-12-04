@@ -48,6 +48,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
+
+//Api
 // Logout route
 app.post('/api/logout', (req, res) => {
   res.clearCookie('token');
