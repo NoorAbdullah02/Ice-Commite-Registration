@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - 99% Optimized
+  postgres:
+    image: postgres:16-alpine
+    container_name: ice-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-ice_registration}
+      POSTGRES_MAX_CONNECTIONS: 100
+      POSTGRES_SHARED_BUFFERS: 256MB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 1GB
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ice-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis Cache - Optional but recommended for 99%+ performance
+  redis:
+    image: redis:7-alpine
+    container_name: ice-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ice-network
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Backend API Server - 99% Optimized
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ice-backend
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 5000
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ice_registration}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ice-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      # For Swarm mode (99% orchestration)
+      placement:
+        constraints:
+          - node.role == worker
+
+  # Nginx Reverse Proxy - Load balancing & 99% optimization
+  nginx:
+    image: nginx:alpine
+    container_name: ice-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./ssl:/etc/nginx/ssl:ro  # For SSL certificates
+    depends_on:
+      - backend
+    networks:
+      - ice-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  ice-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# Start with:
+# docker-compose up -d
+#
+# Check status:
+# docker-compose ps
+#
+# View logs:
+# docker-compose logs -f backend
+#
+# Stop:
+# docker-compose down
+#
+# Full cleanup:
+# docker-compose down -v

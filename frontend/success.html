@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registration Successful</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="images/jepg" href="images/depLogo.png">
+  <link rel="icon" type="image/png" href="images/depLogo.png">
 
   <style>
     * {
@@ -332,7 +332,8 @@
 
     <!-- Photo Section -->
     <div class="photo-section">
-      <img id="photoImg" src="" alt="Profile Photo" class="profile-photo">
+      <img id="photoImg" src="" alt="Profile Photo" class="profile-photo" crossorigin="anonymous" loading="lazy">
+      <p id="photoLoadStatus" style="font-size: 12px; color: #999; margin-top: 5px;"></p>
     </div>
 
     <!-- Confirmation Message -->
@@ -464,10 +465,51 @@
         // Photo show kore
         if (registrationData.photo_url) {
           const photoImg = document.getElementById('photoImg');
+          const photoLoadStatus = document.getElementById('photoLoadStatus');
+          
           if (photoImg) {
+            console.log('Setting photo URL:', registrationData.photo_url);
+            console.log('Photo URL type:', typeof registrationData.photo_url);
+            console.log('Photo URL length:', registrationData.photo_url?.length);
+            
+            // Show loading status
+            if (photoLoadStatus) {
+              photoLoadStatus.textContent = 'Loading image...';
+              photoLoadStatus.style.color = '#667eea';
+            }
+            
+            // Set src attribute
             photoImg.src = registrationData.photo_url;
+            
+            // Add error handling
+            photoImg.onerror = function(e) {
+              console.error('Failed to load image:', registrationData.photo_url);
+              console.error('Error event:', e);
+              
+              if (photoLoadStatus) {
+                photoLoadStatus.textContent = '❌ Image failed to load';
+                photoLoadStatus.style.color = '#e74c3c';
+              }
+              
+              // Show fallback SVG
+              photoImg.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Ccircle cx=%22 90%22 cy=%2290%22 r=%2290%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2216%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3EImage Not Found%3C/text%3E%3C/svg%3E';
+            };
+            
+            // Add success handler
+            photoImg.onload = function() {
+              console.log('Photo loaded successfully');
+              if (photoLoadStatus) {
+                photoLoadStatus.textContent = '✓ Image loaded';
+                photoLoadStatus.style.color = '#27ae60';
+              }
+            };
+            
             console.log('Photo set:', registrationData.photo_url);
+          } else {
+            console.warn('photoImg element not found');
           }
+        } else {
+          console.warn('No photo_url in registration data');
         }
 
         // Note show kore if exists

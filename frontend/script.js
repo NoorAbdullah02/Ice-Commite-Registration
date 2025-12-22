@@ -239,18 +239,23 @@ registrationForm.addEventListener('submit', async (e) => {
     };
 
     console.log('📝 Form Data to Submit:', formData);
-    console.log('Submitting registration data to:', `${API_URL}/api/register`);
+    const registrationUrl = `${API_URL}/api/register/register`;
+    console.log('🚀 FULL URL TO SUBMIT:', registrationUrl);
+    console.log('🚀 Submitting to endpoint: /api/register/register');
 
     // Submit registration
-    const response = await fetch(`${API_URL}/api/register`, {
+    const response = await fetch(registrationUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
+      credentials: 'include'
     });
 
     console.log('📊 Response Status:', response.status);
+    console.log('📊 Response Status Text:', response.statusText);
     const data = await response.json();
     console.log('📦 Registration response:', data);
+    console.log('📦 Full response object:', JSON.stringify(data, null, 2));
 
     if (response.ok) {
       // Store data for success page
@@ -264,7 +269,10 @@ registrationForm.addEventListener('submit', async (e) => {
         window.location.href = '/success.html';
       }, 2000);
     } else {
-      showMessage(`❌ Error: ${data.error || 'Registration failed'}`, 'error');
+      const errorMsg = data.error || data.message || 'Registration failed';
+      const fullError = `Status ${response.status}: ${errorMsg}`;
+      console.error('❌ Registration Error:', fullError);
+      showMessage(`❌ Error: ${fullError}`, 'error');
       hideLoader();
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -283,28 +291,56 @@ async function uploadPhoto(file) {
   const formData = new FormData();
   formData.append('photo', file);
 
-  console.log('📸 Uploading photo to:', `${API_URL}/api/upload`);
+  const uploadUrl = `${API_URL}/api/upload`;
+  console.log('📸 Uploading photo to:', uploadUrl);
   console.log('📄 File:', file.name, file.size, file.type);
 
   try {
-    const response = await fetch(`${API_URL}/api/upload`, {
+    const response = await fetch(uploadUrl, {
       method: 'POST',
-      body: formData
+      body: formData,
+      credentials: 'include'
     });
 
     console.log('✅ Upload response status:', response.status);
+    console.log('✅ Upload response statusText:', response.statusText);
     
     const data = await response.json();
     console.log('📦 Response data:', data);
+    console.log('📦 Full response:', JSON.stringify(data, null, 2));
+    console.log('📦 Data keys:', Object.keys(data));
 
     if (response.ok) {
-      console.log('✅ Photo uploaded successfully:', data.url);
-      return data.url;
+      // Try multiple ways to get the URL
+      let photoUrl = data.url || data.image?.url || data.secure_url;
+      
+      console.log('🔍 Extracted photoUrl:', photoUrl);
+      console.log('🔍 data.url:', data.url);
+      console.log('🔍 data.image:', data.image);
+      
+      if (!photoUrl) {
+        console.error('❌ No photo URL in response:', data);
+        console.error('❌ Response structure:', JSON.stringify(data, null, 2));
+        throw new Error(`No photo URL returned from server. Response: ${JSON.stringify(data)}`);
+      }
+      
+      console.log('✅ Photo uploaded successfully:', photoUrl);
+      
+      // Validate the URL is accessible
+      if (!photoUrl.startsWith('http')) {
+        console.error('❌ Invalid URL format:', photoUrl);
+        throw new Error(`Invalid photo URL format: ${photoUrl}`);
+      }
+      
+      return photoUrl;
     } else {
-      throw new Error(data.error || 'Upload failed');
+      const errorMsg = data.error || `Upload failed with status ${response.status}`;
+      console.error('❌ Upload failed:', errorMsg);
+      throw new Error(errorMsg);
     }
   } catch (error) {
     console.error('❌ Photo upload error:', error);
+    console.error('❌ Error message:', error.message);
     throw new Error(`Photo upload failed: ${error.message}`);
   }
 }

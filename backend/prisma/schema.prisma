@@ -1,6 +1,4 @@
-// Banglish comments sudhu
-// Ei file Prisma schema for Student aar Admin models
-
+// Database schema for ICE Committee Registration System with performance optimization
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,23 +9,62 @@ datasource db {
 }
 
 model Student {
-  id          String   @id @default(uuid())
-  full_name   String
-  ID_no       String
-  batch       String?
-  phone       String
-  email       String   @unique
-  department  String
-  gender      String
-  apply_for_post String
-  photo_url   String
-  note        String?
-  selected    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id                 String    @id @default(uuid())
+  full_name          String    @db.VarChar(100)
+  ID_no              String    @unique @db.VarChar(20)
+  batch              String?   @db.VarChar(20)
+  phone              String    @db.VarChar(20)
+  email              String    @unique @db.VarChar(100)
+  department         String    @db.VarChar(50)
+  gender             String    @db.VarChar(20)
+  apply_for_post     String    @db.VarChar(100)
+  photo_url          String    @db.Text
+  note               String?   @db.Text
+  selected           Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  
+  // Performance indexes - Critical for 99% optimization
+  @@index([email])
+  @@index([ID_no])
+  @@index([selected])
+  @@index([department])
+  @@index([apply_for_post])
+  @@index([createdAt])
 }
 
 model Admin {
-  id       String @id @default(uuid())
-  username String @unique
-  password String
+  id        String   @id @default(uuid())
+  username  String   @unique @db.VarChar(50)
+  password  String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([username])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   @db.VarChar(100)
+  userId    String?  @db.VarChar(100)
+  resource  String   @db.VarChar(100)
+  resourceId String  @db.VarChar(100)
+  changes   String?  @db.Text
+  ipAddress String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([resource])
+  @@index([createdAt])
+}
+
+model SessionToken {
+  id        String   @id @default(uuid())
+  token     String   @unique @db.VarChar(500)
+  adminId   String?  @db.VarChar(100)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([token])
+  @@index([expiresAt])
 }

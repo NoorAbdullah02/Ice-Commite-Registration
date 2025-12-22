@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .info {
+            color: #2980b9;
+            font-weight: bold;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Endpoint Test</h1>
+        
+        <div class="test-section">
+            <h2>Test 1: Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <pre id="health-result">Waiting...</pre>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Registration Endpoint</h2>
+            <button onclick="testRegistration()">Test Registration Endpoint</button>
+            <pre id="registration-result">Waiting...</pre>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Current API URL</h2>
+            <button onclick="checkAPI()">Check API Configuration</button>
+            <pre id="api-result">Waiting...</pre>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Browser Cache Status</h2>
+            <button onclick="checkCache()">Check Cache</button>
+            <pre id="cache-result">Waiting...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        async function testHealth() {
+            const result = document.getElementById('health-result');
+            result.textContent = 'Testing...';
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                result.innerHTML = `<span class="success">✅ SUCCESS (${response.status})</span>\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+
+        async function testRegistration() {
+            const result = document.getElementById('registration-result');
+            result.textContent = 'Testing...';
+            try {
+                const testData = {
+                    full_name: 'Test User',
+                    ID_no: '12345',
+                    batch: '20',
+                    phone: '+8801748269350',
+                    email: 'test' + Date.now() + '@example.com',
+                    department: 'ICE',
+                    gender: 'Male',
+                    apply_for_post: 'President',
+                    photo_url: 'https://via.placeholder.com/150',
+                    note: 'Test registration'
+                };
+
+                const response = await fetch(`${API_URL}/api/register/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<span class="success">✅ SUCCESS (${response.status})</span>\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ ERROR (${response.status})</span>\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+
+        function checkAPI() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = `<span class="info">ℹ️ API Configuration</span>
+API_URL: ${API_URL}
+Hostname: ${window.location.hostname}
+Protocol: ${window.location.protocol}
+Port: ${window.location.port}
+
+Registration Endpoint: ${API_URL}/api/register/register
+Upload Endpoint: ${API_URL}/api/upload
+Health Endpoint: ${API_URL}/health`;
+        }
+
+        function checkCache() {
+            const result = document.getElementById('cache-result');
+            const cacheInfo = `<span class="info">ℹ️ Cache Information</span>
+LocalStorage items: ${Object.keys(localStorage).length}
+SessionStorage items: ${Object.keys(sessionStorage).length}
+Cookies: ${document.cookie ? document.cookie : 'No cookies'}
+
+To clear cache:
+1. Press: Ctrl+Shift+Delete (or Cmd+Shift+Delete on Mac)
+2. Select: All time
+3. Check: Cached images and files
+4. Click: Clear data`;
+            result.innerHTML = cacheInfo;
+        }
+
+        // Auto-run checks on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAPI();
+        });
+    </script>
+</body>
+</html>

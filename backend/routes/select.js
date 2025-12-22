@@ -1,6 +1,3 @@
-// Banglish comments sudhu
-// Ei file student select kore aar selection email pathay
-
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth.js';
@@ -9,56 +6,96 @@ import { sendSelectionEmail } from '../utils/email.js';
 const router = Router();
 const prisma = new PrismaClient();
 
-// POST /api/select - select a student for committee
+// POST /api/select - Select a single student for committee
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const { studentId } = req.body;
 
-    if (!studentId) {
-      return res.status(400).json({ error: 'Student ID required' });
+    // Validate input
+    if (!studentId || typeof studentId !== 'string') {
+      return res.status(400).json({ 
+        error: 'Valid student ID required',
+        code: 'INVALID_STUDENT_ID'
+      });
     }
 
-    // Student find kore
+    // Find student
     const student = await prisma.student.findUnique({
       where: { id: studentId }
     });
 
     if (!student) {
-      return res.status(404).json({ error: 'Student not found' });
+      return res.status(404).json({ 
+        error: 'Student not found',
+        code: 'STUDENT_NOT_FOUND'
+      });
     }
 
-    // Selected flag update kore
+    if (student.selected) {
+      return res.status(400).json({ 
+        error: 'Student is already selected',
+        code: 'ALREADY_SELECTED'
+      });
+    }
+
+    // Update student selection status
     const updatedStudent = await prisma.student.update({
       where: { id: studentId },
       data: { selected: true }
     });
 
-    // Selection email pathay
+    // Send selection notification email (non-critical)
     try {
-      await sendSelectionEmail(student.full_name, student.email, student.apply_for_post, student);
+      await sendSelectionEmail(
+        student.full_name,
+        student.email,
+        student.apply_for_post,
+        student
+      );
+      console.log('✅ Selection email sent to:', student.email);
     } catch (emailError) {
-      console.log('Email send failed (non-critical):', emailError.message);
-      // Student already selected, email fail hole bhi ok
+      console.warn('⚠️ Selection email failed (non-critical):', emailError.message);
     }
 
     res.json({
       success: true,
-      message: 'Student selected and email sent',
-      student: updatedStudent
+      message: 'Student selected successfully',
+      student: {
+        id: updatedStudent.id,
+        full_name: updatedStudent.full_name,
+        email: updatedStudent.email,
+        apply_for_post: updatedStudent.apply_for_post,
+        selected: updatedStudent.selected
+      }
     });
   } catch (error) {
     console.error('Select student error:', error);
-    res.status(500).json({ error: 'Failed to select student' });
+    res.status(500).json({ 
+      error: 'Failed to select student',
+      code: 'SELECT_ERROR',
+      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    });
   }
 });
 
-// POST /api/select/bulk - bulk select multiple students
+// POST /api/select/bulk - Bulk select multiple students
 router.post('/bulk', authMiddleware, async (req, res) => {
   try {
     const { studentIds } = req.body;
 
-    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
-      return res.status(400).json({ error: 'Student IDs array required' });
+    // Validate input
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({ 
+        error: 'Array of student IDs required',
+        code: 'INVALID_STUDENT_IDS'
+      });
+    }
+
+    if (studentIds.length > 1000) {
+      return res.status(400).json({ 
+        error: 'Cannot select more than 1000 students at once',
+        code: 'TOO_MANY_STUDENTS'
+      });
     }
 
     // Verify all students exist
@@ -66,63 +103,160 @@ router.post('/bulk', authMiddleware, async (req, res) => {
       where: { id: { in: studentIds } }
     });
 
-    if (students.length !== studentIds.length) {
-      return res.status(404).json({ error: 'One or more students not found' });
+    if (students.length === 0) {
+      return res.status(404).json({ 
+        error: 'No students found',
+        code: 'NO_STUDENTS_FOUND'
+      });
     }
 
-    // Update all students to selected
+    if (students.length !== studentIds.length) {
+      const foundIds = new Set(students.map(s => s.id));
+      const notFound = studentIds.filter(id => !foundIds.has(id));
+      return res.status(400).json({ 
+        error: 'Some students not found',
+        code: 'PARTIAL_STUDENTS_FOUND',
+        notFound: notFound.slice(0, 10) // Return first 10 not found
+      });
+    }
+
+    // Filter already selected students
+    const toSelect = students.filter(s => !s.selected);
+
+    if (toSelect.length === 0) {
+      return res.status(400).json({ 
+        error: 'All students are already selected',
+        code: 'ALL_SELECTED'
+      });
+    }
+
+    // Update students in batch
     const updatedStudents = await prisma.student.updateMany({
-      where: { id: { in: studentIds } },
+      where: { id: { in: toSelect.map(s => s.id) } },
       data: { selected: true }
     });
 
-    // Send confirmation emails to all students
+    // Send emails to newly selected students
     let emailSuccessCount = 0;
     let emailFailCount = 0;
 
-    for (const student of students) {
+    for (const student of toSelect) {
       try {
-        await sendSelectionEmail(student.full_name, student.email, student.apply_for_post, student);
+        await sendSelectionEmail(
+          student.full_name,
+          student.email,
+          student.apply_for_post,
+          student
+        );
         emailSuccessCount++;
       } catch (emailError) {
-        console.log(`Email failed for ${student.email}:`, emailError.message);
+        console.warn(`⚠️ Email failed for ${student.email}:`, emailError.message);
         emailFailCount++;
       }
     }
 
     res.json({
       success: true,
-      message: `Successfully confirmed ${updatedStudents.count} students`,
-      confirmed: updatedStudents.count,
-      emailsSent: emailSuccessCount,
-      emailsFailed: emailFailCount
+      message: `${updatedStudents.count} students selected`,
+      stats: {
+        selected: updatedStudents.count,
+        emailsSent: emailSuccessCount,
+        emailsFailed: emailFailCount
+      }
     });
   } catch (error) {
     console.error('Bulk select error:', error);
-    res.status(500).json({ error: 'Failed to bulk select students' });
+    res.status(500).json({ 
+      error: 'Failed to bulk select students',
+      code: 'BULK_SELECT_ERROR',
+      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    });
   }
 });
 
-// DELETE /api/select/:id - delete a student
+// POST /api/select/deselect - Deselect a student
+router.post('/deselect', authMiddleware, async (req, res) => {
+  try {
+    const { studentId } = req.body;
+
+    if (!studentId) {
+      return res.status(400).json({ 
+        error: 'Student ID required',
+        code: 'INVALID_STUDENT_ID'
+      });
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { id: studentId }
+    });
+
+    if (!student) {
+      return res.status(404).json({ 
+        error: 'Student not found',
+        code: 'STUDENT_NOT_FOUND'
+      });
+    }
+
+    const updatedStudent = await prisma.student.update({
+      where: { id: studentId },
+      data: { selected: false }
+    });
+
+    res.json({
+      success: true,
+      message: 'Student deselected successfully',
+      student: {
+        id: updatedStudent.id,
+        full_name: updatedStudent.full_name,
+        selected: updatedStudent.selected
+      }
+    });
+  } catch (error) {
+    console.error('Deselect error:', error);
+    res.status(500).json({ 
+      error: 'Failed to deselect student',
+      code: 'DESELECT_ERROR'
+    });
+  }
+});
+
+// DELETE /api/select/:id - Delete a student record
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const student = await prisma.student.findUnique({ where: { id } });
-    if (!student) {
-      return res.status(404).json({ error: 'Student not found' });
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ 
+        error: 'Valid student ID required',
+        code: 'INVALID_STUDENT_ID'
+      });
     }
 
-    // Delete kore
+    const student = await prisma.student.findUnique({ 
+      where: { id } 
+    });
+
+    if (!student) {
+      return res.status(404).json({ 
+        error: 'Student not found',
+        code: 'STUDENT_NOT_FOUND'
+      });
+    }
+
     await prisma.student.delete({ where: { id } });
 
     res.json({
       success: true,
-      message: 'Student deleted successfully'
+      message: 'Student deleted successfully',
+      deletedId: id
     });
   } catch (error) {
     console.error('Delete student error:', error);
-    res.status(500).json({ error: 'Failed to delete student' });
+    res.status(500).json({ 
+      error: 'Failed to delete student',
+      code: 'DELETE_ERROR',
+      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    });
   }
 });
 
