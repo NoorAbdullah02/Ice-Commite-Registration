@@ -246,7 +246,7 @@
     <div class="info-box">
       📍 <strong>Current Setup:</strong>
       <br>
-      This page is served from: <strong id="currentUrl">http://localhost:5000/</strong>
+      This page is served from: <strong id="currentUrl">http://localhost:3000/</strong>
       <br>
       API pointing to: <strong id="apiUrl">https://ice-commite-registration.onrender.com</strong>
       <br>
@@ -264,7 +264,7 @@
 cd /home/noor-abdullah/Desktop/ICPC_MOCK/backend
 node server.js
           </div>
-          <strong>Expected:</strong> "🚀 Server running on http://localhost:5000"
+          <strong>Expected:</strong> "🚀 Server running on http://localhost:3000"
         </div>
       </div>
 
@@ -319,14 +319,14 @@ https://ice-commite-registration.onrender.com
       <h3>📊 Understanding the Error</h3>
 
       <div class="diagram">
-Browser at: http://localhost:5000/
+Browser at: http://localhost:3000/
          ↓
 JavaScript tries to upload photo to:
 https://ice-commite-registration.onrender.com/api/upload
          ↓
 Browser checks: "Same origin?"
          ↓
-NO! localhost:5000 ≠ onrender.com
+NO! localhost:3000 ≠ onrender.com
          ↓
 Browser blocks request (CORS Policy)
          ↓
@@ -348,7 +348,7 @@ onrender.com';
           <code>const API_URL = 
 window.location.hostname
 === 'localhost'
-  ? 'http://localhost:5000'
+  ? 'http://localhost:3000'
   : 'https://...onrender.com';</code>
         </div>
       </div>

@@ -41,8 +41,8 @@ echo "Backend started with PID: $SERVER_PID"
 sleep 4
 
 # Check if server is running
-if curl -s http://localhost:5000/health > /dev/null 2>&1; then
-    echo "✅ Backend server is running at http://localhost:5000"
+if curl -s http://localhost:3000/health > /dev/null 2>&1; then
+    echo "✅ Backend server is running at http://localhost:3000"
 else
     echo "⚠️ Server might not be ready yet"
 fi
@@ -57,16 +57,16 @@ echo ""
 echo "1️⃣  Close ALL browser windows completely"
 echo "2️⃣  Wait 5 seconds"
 echo "3️⃣  Open a NEW browser window"
-echo "4️⃣  Type: http://localhost:5000"
+echo "4️⃣  Type: http://localhost:3000"
 echo "5️⃣  Press: F12 (open developer tools)"
 echo "6️⃣  In console, see if it shows:"
-echo "     🚀 FULL URL TO SUBMIT: http://localhost:5000/api/register/register"
+echo "     🚀 FULL URL TO SUBMIT: http://localhost:3000/api/register/register"
 echo ""
 echo "7️⃣  If you see that 👆, cache is cleared!"
 echo "8️⃣  Fill form and submit"
 echo "9️⃣  Should see: ✅ Response Status: 201"
 echo ""
 echo "🧪 TEST FIRST:"
-echo "   Go to: http://localhost:5000/test-api.html"
+echo "   Go to: http://localhost:3000/test-api.html"
 echo "   Click all test buttons"
 echo ""

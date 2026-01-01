@@ -150,7 +150,7 @@ export class HealthChecker {
         await Promise.race([
           check.fn(),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Health check timeout')), 5000)
+            setTimeout(() => reject(new Error('Health check timeout')), 3000)
           )
         ]);
         

@@ -27,14 +27,14 @@ const frontendPath = path.join(__dirname, '../frontend');
 const prisma = new PrismaClient();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // CORS Configuration with whitelist - Advanced 99% optimization
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:5000',
+  'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'http://127.0.0.1:5000',
+  'http://127.0.0.1:3000',
   'https://ice-commite-registration.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);

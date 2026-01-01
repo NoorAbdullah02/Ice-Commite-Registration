@@ -75,7 +75,7 @@ CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 
 # App Configuration
-PORT=5000
+PORT=3000
 NODE_ENV=development
 FRONTEND_URL="http://localhost:3000"
 JWT_SECRET="your-super-secret-key-change-in-production"
@@ -379,14 +379,14 @@ Password: noorabdullah
 
 ### Test Admin Login
 ```bash
-curl -X POST http://localhost:5000/api/admin/login \
+curl -X POST http://localhost:3000/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{"username":"ice_dep","password":"ice_dep12"}'
 ```
 
 ### Test Registration
 ```bash
-curl -X POST http://localhost:5000/api/register/register \
+curl -X POST http://localhost:3000/api/register/register \
   -H "Content-Type: application/json" \
   -d '{
     "full_name": "Test User",

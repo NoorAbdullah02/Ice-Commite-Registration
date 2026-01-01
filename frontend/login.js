@@ -2,7 +2,7 @@
    // API Configuration
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const API_URL = isDevelopment 
-      ? 'http://localhost:5000'
+      ? 'http://localhost:3000'
       : 'https://ice-commite-registration.onrender.com';
     
     console.log('🌐 Environment:', isDevelopment ? 'Development' : 'Production');
@@ -145,7 +145,7 @@
       // Auto-hide after 5 seconds
       setTimeout(() => {
         container.innerHTML = '';
-      }, 5000);
+      }, 3000);
     }
 
     // Add shake animation

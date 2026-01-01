@@ -32,7 +32,7 @@ npm run dev &
 sleep 3
 
 # Verify server is running
-if curl -s http://localhost:5000/health > /dev/null 2>&1; then
+if curl -s http://localhost:3000/health > /dev/null 2>&1; then
     echo "✅ Backend server is running!"
 else
     echo "❌ Backend server failed to start"
@@ -47,7 +47,7 @@ echo "📋 NEXT STEPS:"
 echo ""
 echo "1. Close your browser completely"
 echo "2. Reopen browser"
-echo "3. Go to: http://localhost:5000"
+echo "3. Go to: http://localhost:3000"
 echo "4. Press: Ctrl+Shift+Delete"
 echo "5. Select 'All time' and 'Cached images and files'"
 echo "6. Click 'Clear data'"
@@ -56,5 +56,5 @@ echo "8. Open console: F12"
 echo "9. Fill and submit form"
 echo "10. Check console for: ✅ Response Status: 201"
 echo ""
-echo "Test page: http://localhost:5000/test-api.html"
+echo "Test page: http://localhost:3000/test-api.html"
 echo ""

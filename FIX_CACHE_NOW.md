@@ -4,12 +4,12 @@
 
 Console shows:
 ```
-script.js:242 Submitting registration data to: http://localhost:5000/api/register  ❌ WRONG
+script.js:242 Submitting registration data to: http://localhost:3000/api/register  ❌ WRONG
 ```
 
 Should show:
 ```
-script.js:242 Submitting registration data to: http://localhost:5000/api/register/register  ✅ CORRECT
+script.js:242 Submitting registration data to: http://localhost:3000/api/register/register  ✅ CORRECT
 ```
 
 ## Why This Happens
@@ -60,7 +60,7 @@ echo "✅ Cache cleared!"
 
 ```bash
 # Check server status
-curl http://localhost:5000/health
+curl http://localhost:3000/health
 
 # Should return:
 # {"status":"Server is running","timestamp":"...","environment":"development"}
@@ -70,7 +70,7 @@ curl http://localhost:5000/health
 
 ```
 1. Open browser
-2. Go to: http://localhost:5000
+2. Go to: http://localhost:3000
 3. Press: Ctrl+Shift+Delete
 4. Select: All time
 5. Check: ✓ Cookies, ✓ Cached images and files
@@ -92,7 +92,7 @@ This does a HARD refresh, bypassing cache
 3. Click Submit
 4. Check console for this message:
    ```
-   ✅ 🚀 FULL URL TO SUBMIT: http://localhost:5000/api/register/register
+   ✅ 🚀 FULL URL TO SUBMIT: http://localhost:3000/api/register/register
    ✅ Response Status: 201
    ```
 
@@ -104,7 +104,7 @@ Before submitting the actual form, test with our test page:
 
 ```bash
 # Open in browser:
-http://localhost:5000/test-api.html
+http://localhost:3000/test-api.html
 
 # Click the red buttons to verify:
 ✅ Health Check works
@@ -124,12 +124,12 @@ Open browser DevTools (F12) and check console.
 
 **BEFORE (Cache not cleared)**:
 ```
-script.js:242 Submitting registration data to: http://localhost:5000/api/register
+script.js:242 Submitting registration data to: http://localhost:3000/api/register
 ```
 
 **AFTER (Cache cleared)** ✅:
 ```
-script.js:242 🚀 FULL URL TO SUBMIT: http://localhost:5000/api/register/register
+script.js:242 🚀 FULL URL TO SUBMIT: http://localhost:3000/api/register/register
 script.js:243 🚀 Submitting to endpoint: /api/register/register
 ```
 
@@ -171,7 +171,7 @@ cd /home/noor-abdullah/Personal/Ice-Commite-Registration/backend
 npm run dev
 
 # 4. Wait 5 seconds, then open browser
-# 5. Go to: http://localhost:5000
+# 5. Go to: http://localhost:3000
 # 6. Press: Ctrl+Shift+Delete → Clear all → Yes
 # 7. Hard refresh: Ctrl+Shift+R
 ```
@@ -220,14 +220,14 @@ If browser has old code, it only sends to `/api/register` (without the second `/
 ### ✅ Check 1: Server Running
 
 ```bash
-curl http://localhost:5000/health
+curl http://localhost:3000/health
 # Should return JSON with "status": "Server is running"
 ```
 
 ### ✅ Check 2: Route Exists
 
 ```bash
-curl -X OPTIONS http://localhost:5000/api/register/register
+curl -X OPTIONS http://localhost:3000/api/register/register
 # Should NOT return 404
 ```
 
@@ -240,7 +240,7 @@ grep "FULL URL TO SUBMIT" /home/noor-abdullah/Personal/Ice-Commite-Registration/
 
 ### ✅ Check 4: Browser Has Latest Code
 
-1. Go to: http://localhost:5000
+1. Go to: http://localhost:3000
 2. Press: F12
 3. Type in console: `location.reload(true)` and press Enter
 4. Then check console for: "🚀 FULL URL TO SUBMIT"
@@ -268,10 +268,10 @@ After following all steps, when you submit:
 
 ```
 Console Shows ✅:
-📸 Uploading photo to: http://localhost:5000/api/upload
+📸 Uploading photo to: http://localhost:3000/api/upload
 ✅ Upload response status: 200
 📦 Photo uploaded successfully: https://res.cloudinary.com/...
-🚀 FULL URL TO SUBMIT: http://localhost:5000/api/register/register  ← KEY LINE
+🚀 FULL URL TO SUBMIT: http://localhost:3000/api/register/register  ← KEY LINE
 🚀 Submitting to endpoint: /api/register/register
 📊 Response Status: 201  ← SUCCESS!
 ✅ Registration successful! Redirecting...
@@ -309,7 +309,7 @@ When asking for help, provide:
 
 1. **Screenshot of console** showing exact error
 2. **Output of**: `grep "FULL URL" frontend/script.js`
-3. **Result of**: `curl http://localhost:5000/health`
+3. **Result of**: `curl http://localhost:3000/health`
 4. **Browser you're using** (Chrome, Firefox, Safari, Edge)
 5. **OS** (Windows, Linux, Mac)
 
