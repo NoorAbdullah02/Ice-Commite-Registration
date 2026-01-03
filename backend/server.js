@@ -36,6 +36,7 @@ const allowedOrigins = [
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3000',
   'https://ice-commite-registration.vercel.app',
+  'https://ice-commite-registration.onrender.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
