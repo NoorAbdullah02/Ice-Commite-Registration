@@ -1,5 +1,5 @@
 node_modules/
-#.env
+.env
 .env.local
 .env.*.local
 *.log
@@ -11,4 +11,5 @@ build/
 *.db
 *.sqlite
 
-
+backend/.env
+frontend/.env
