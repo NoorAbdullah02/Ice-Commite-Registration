@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+.DS_Store
+dist/
+build/
+.prisma/
+*.db
+*.sqlite
+
+backend/.env
+frontend/.env
